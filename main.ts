@@ -21,14 +21,12 @@ const updateReadingMode = (element: HTMLElement, plugin: InlineSpoilerPlugin) =>
 
 		if (matches) {
 			for (const match of matches) {
-				const spoilerSpan = document.createElement("span");
-				spoilerSpan.classList.add("inline_spoilers-spoiler");
-				spoilerSpan.innerText = match.slice(2, -2);
+				const spoilerSpan = createSpan({ cls: "inline_spoilers-spoiler", text: match.slice(2, -2) });
 				newHTML = newHTML.replace(match, spoilerSpan.outerHTML);
 			}
-		}
 
-		paragraph.innerHTML = newHTML;
+			paragraph.innerHTML = newHTML;
+		}
 	}
 
 	const spoilers = element.findAll(".inline_spoilers-spoiler");
@@ -46,7 +44,7 @@ export default class InlineSpoilerPlugin extends Plugin {
 	async onload() {
 		await this.loadSettings();
 
-		const readingView = document.querySelector(".markdown-reading-view");
+		const readingView = this.app.workspace.containerEl.querySelector(".markdown-reading-view");
 		if (readingView) {
 			updateReadingMode(readingView as HTMLElement, this);
 		}
@@ -71,21 +69,21 @@ export default class InlineSpoilerPlugin extends Plugin {
 
 	onunload() {
 		// undo changes to the body
-		document.body.classList.remove("inline_spoilers-revealed");
+		this.app.workspace.containerEl.classList.remove("inline_spoilers-revealed");
 
 		// remove all spoilers
-		const spoilers = Array.from(document.querySelectorAll(".inline_spoilers-spoiler"));
+		const spoilers = Array.from(this.app.workspace.containerEl.querySelectorAll(".inline_spoilers-spoiler")) as HTMLElement[];
 		for (const spoiler of spoilers) {
-			spoiler.outerHTML = `||${spoiler.innerHTML}||`;
+			spoiler.outerHTML = `||${spoiler.innerText}||`;
 		}
 	}
 
 	async loadSettings() {
 		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
 		if (this.settings.showAllSpoilers) {
-			document.body.classList.add("inline_spoilers-revealed");
+			this.app.workspace.containerEl.classList.add("inline_spoilers-revealed");
 		} else {
-			document.body.classList.remove("inline_spoilers-revealed");
+			this.app.workspace.containerEl.classList.remove("inline_spoilers-revealed");
 		}
 	}
 
@@ -116,9 +114,9 @@ class InlineSpoilerPluginSettingsTab extends PluginSettingTab {
 					this.plugin.settings.showAllSpoilers = value;
 
 					if (value) {
-						document.body.classList.add("inline_spoilers-revealed");
+						this.app.workspace.containerEl.classList.add("inline_spoilers-revealed");
 					} else {
-						document.body.classList.remove("inline_spoilers-revealed");
+						this.app.workspace.containerEl.classList.remove("inline_spoilers-revealed");
 					}
 
 					await this.plugin.saveSettings();
