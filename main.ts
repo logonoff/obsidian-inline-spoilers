@@ -10,31 +10,41 @@ const DEFAULT_SETTINGS: InlineSpoilerPluginSettings = {
 
 const SPOILER_REGEX = /\|\|(.+?)\|\|/g;
 
+const processNode = (node: Node) => {
+    if (node.nodeType === Node.TEXT_NODE) {
+		if (!node.textContent || !node.parentNode) return;
+
+        // Split the text node content by the spoiler pattern, keeping the delimiters
+        const parts = node.textContent.split(/(\|\|[^|]+\|\|)/g);
+        const fragment = document.createDocumentFragment();
+
+        for (const part of parts) {
+            if (SPOILER_REGEX.test(part)) {
+                // It's a spoiler, create a span for it
+                const spoilerText = part.slice(2, -2); // Remove the || delimiters
+                const spoilerSpan = createSpan({ cls: "inline_spoilers-spoiler", text: spoilerText });
+                fragment.appendChild(spoilerSpan);
+            } else {
+                // It's regular text, create a text node for it
+                const textNode = document.createTextNode(part);
+                fragment.appendChild(textNode);
+            }
+        }
+
+        // Replace the original text node with the new fragment
+        node.parentNode.replaceChild(fragment, node);
+    } else if (node.nodeType === Node.ELEMENT_NODE) {
+        // For element nodes, recursively process their child nodes
+        Array.from(node.childNodes).forEach(processNode);
+    }
+}
+
 const updateReadingMode = (element: HTMLElement, plugin: InlineSpoilerPlugin) => {
 	const allowedElems = element.findAll("p, li, h1, h2, h3, h4, h5, h6, blockquote, em, strong, b, i, a, th, td");
 
 	for (const elem of allowedElems) {
-		// Split the text content of the element by the spoiler pattern, keeping the delimiters
-		const parts = elem.innerText.split(/(\|\|[^|]+\|\|)/g);
-
-		// Clear the element's content
-		while (elem.firstChild) {
-			elem.removeChild(elem.firstChild);
-		}
-
-		// Process each part
-		for (const part of parts) {
-			if (SPOILER_REGEX.test(part)) {
-				// It's a spoiler, create a span for it
-				const spoilerText = part.slice(2, -2); // Remove the || delimiters
-				const spoilerSpan = createSpan({ cls: "inline_spoilers-spoiler", text: spoilerText });
-				elem.appendChild(spoilerSpan);
-			} else {
-				// It's regular text, create a text node for it
-				const textNode = document.createTextNode(part);
-				elem.appendChild(textNode);
-			}
-		}
+		// Process each child node of the element
+		Array.from(elem.childNodes).forEach(processNode);
 	}
 
 	const spoilers = element.findAll(".inline_spoilers-spoiler");
