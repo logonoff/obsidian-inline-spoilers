@@ -1,7 +1,7 @@
 {
 	"name": "obsidian-inline-spoilers",
-	"version": "1.0.0",
-	"description": "Implements Discord-like syntax for inline spoilers in Obsidian notes.",
+	"version": "1.0.1",
+	"description": "Adds Discord-like syntax for inline spoilers in reader mode.",
 	"main": "main.js",
 	"scripts": {
 		"dev": "node esbuild.config.mjs",

@@ -11,13 +11,13 @@ const DEFAULT_SETTINGS: InlineSpoilerPluginSettings = {
 const SPOILER_REGEX = /\|\|(.+?)\|\|/g;
 
 const updateReadingMode = (element: HTMLElement, plugin: InlineSpoilerPlugin) => {
-	const paragraphs = element.findAll("p");
+	const allowedElems = element.findAll("p, li, h1, h2, h3, h4, h5, h6, blockquote, em, strong, b, i, a, th, td");
 
-	for (const paragraph of paragraphs) {
-		let newHTML = paragraph.innerHTML;
+	for (const elem of allowedElems) {
+		let newHTML = elem.innerHTML;
 
 		// find all substrings that start and end with the string "||"
-		const matches = paragraph.innerText.match(SPOILER_REGEX);
+		const matches = elem.innerText.match(SPOILER_REGEX);
 
 		if (matches) {
 			for (const match of matches) {
@@ -25,7 +25,7 @@ const updateReadingMode = (element: HTMLElement, plugin: InlineSpoilerPlugin) =>
 				newHTML = newHTML.replace(match, spoilerSpan.outerHTML);
 			}
 
-			paragraph.innerHTML = newHTML;
+			elem.innerHTML = newHTML;
 		}
 	}
 
