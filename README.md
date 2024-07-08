@@ -4,7 +4,7 @@ This plugin adds support for inline spoilers in [Obsidian](https://obsidian.md) 
 ![Demo gif](https://i.imgur.com/LKqBaug.gif)
 
 ## Usage
-To create an inline spoiler, wrap the text you want to hide in `||`, or by using the "Inline spoilers: Create spoiler" command in the command palette. For example:
+To create an inline spoiler, wrap the text you want to hide in `||`, or by performing the **Inline spoilers: Create spoiler** command. For example:
 
 ```
 ||This text will be hidden||
