@@ -14,18 +14,26 @@ const updateReadingMode = (element: HTMLElement, plugin: InlineSpoilerPlugin) =>
 	const allowedElems = element.findAll("p, li, h1, h2, h3, h4, h5, h6, blockquote, em, strong, b, i, a, th, td");
 
 	for (const elem of allowedElems) {
-		let newHTML = elem.innerHTML;
+		// Split the text content of the element by the spoiler pattern, keeping the delimiters
+		const parts = elem.innerText.split(/(\|\|[^|]+\|\|)/g);
 
-		// find all substrings that start and end with the string "||"
-		const matches = elem.innerText.match(SPOILER_REGEX);
+		// Clear the element's content
+		while (elem.firstChild) {
+			elem.removeChild(elem.firstChild);
+		}
 
-		if (matches) {
-			for (const match of matches) {
-				const spoilerSpan = createSpan({ cls: "inline_spoilers-spoiler", text: match.slice(2, -2) });
-				newHTML = newHTML.replace(match, spoilerSpan.outerHTML);
+		// Process each part
+		for (const part of parts) {
+			if (SPOILER_REGEX.test(part)) {
+				// It's a spoiler, create a span for it
+				const spoilerText = part.slice(2, -2); // Remove the || delimiters
+				const spoilerSpan = createSpan({ cls: "inline_spoilers-spoiler", text: spoilerText });
+				elem.appendChild(spoilerSpan);
+			} else {
+				// It's regular text, create a text node for it
+				const textNode = document.createTextNode(part);
+				elem.appendChild(textNode);
 			}
-
-			elem.innerHTML = newHTML;
 		}
 	}
 
@@ -74,17 +82,17 @@ export default class InlineSpoilerPlugin extends Plugin {
 		// remove all spoilers
 		const spoilers = Array.from(this.app.workspace.containerEl.querySelectorAll(".inline_spoilers-spoiler")) as HTMLElement[];
 		for (const spoiler of spoilers) {
-			spoiler.outerHTML = `||${spoiler.innerText}||`;
+			const parent = spoiler.parentNode;
+			const spoilerText = document.createTextNode(`||${spoiler.innerText}||`);
+			if (parent) {
+				parent.replaceChild(spoilerText, spoiler);
+			}
 		}
 	}
 
 	async loadSettings() {
 		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
-		if (this.settings.showAllSpoilers) {
-			this.app.workspace.containerEl.classList.add("inline_spoilers-revealed");
-		} else {
-			this.app.workspace.containerEl.classList.remove("inline_spoilers-revealed");
-		}
+		this.app.workspace.containerEl.toggleClass("inline_spoilers-revealed", this.settings.showAllSpoilers);
 	}
 
 	async saveSettings() {
@@ -112,13 +120,7 @@ class InlineSpoilerPluginSettingsTab extends PluginSettingTab {
 				.setValue(this.plugin.settings.showAllSpoilers)
 				.onChange(async (value) => {
 					this.plugin.settings.showAllSpoilers = value;
-
-					if (value) {
-						this.app.workspace.containerEl.classList.add("inline_spoilers-revealed");
-					} else {
-						this.app.workspace.containerEl.classList.remove("inline_spoilers-revealed");
-					}
-
+					this.app.workspace.containerEl.toggleClass("inline_spoilers-revealed", value);
 					await this.plugin.saveSettings();
 				}));
 	}

@@ -18,4 +18,4 @@ If you want to combine various formatting options, you can nest them, but make s
 *||This text will be hidden and italicized||*
 ```
 
-To reveal or hide a spoiler, click on it. You may opt to always show all spoilers by enabling the "Always show spoilers" setting.
+To reveal or hide a spoiler, click on it. You may opt to always show all spoilers by enabling the **Always show spoilers** setting.
