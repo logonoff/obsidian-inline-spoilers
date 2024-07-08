@@ -1,78 +1,92 @@
-import { syntaxTree } from "@codemirror/language";
-import {
-	Extension,
-	RangeSetBuilder,
-	StateField,
-	Transaction,
-} from "@codemirror/state";
-import {
-	Decoration,
-	DecorationSet, EditorView, WidgetType
-} from "@codemirror/view";
-import { App, Editor, MarkdownView, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import { App, Editor, Plugin, PluginSettingTab, Setting } from 'obsidian';
 
-// Remember to rename these classes and interfaces!
-
-interface MyPluginSettings {
+interface InlineSpoilerPluginSettings {
 	showAllSpoilers: boolean;
 }
 
-const DEFAULT_SETTINGS: MyPluginSettings = {
+const DEFAULT_SETTINGS: InlineSpoilerPluginSettings = {
 	showAllSpoilers: false
 }
 
-export default class MyPlugin extends Plugin {
-	settings: MyPluginSettings;
+const SPOILER_REGEX = /\|\|(.+?)\|\|/g;
+
+const updateReadingMode = (element: HTMLElement, plugin: InlineSpoilerPlugin) => {
+	const paragraphs = element.findAll("p");
+
+	for (const paragraph of paragraphs) {
+		let newHTML = paragraph.innerHTML;
+
+		// find all substrings that start and end with the string "||"
+		const matches = paragraph.innerText.match(SPOILER_REGEX);
+
+		if (matches) {
+			for (const match of matches) {
+				const spoilerSpan = document.createElement("span");
+				spoilerSpan.classList.add("inline_spoilers-spoiler");
+				spoilerSpan.innerText = match.slice(2, -2);
+				newHTML = newHTML.replace(match, spoilerSpan.outerHTML);
+			}
+		}
+
+		paragraph.innerHTML = newHTML;
+	}
+
+	const spoilers = element.findAll(".inline_spoilers-spoiler");
+
+	for (const spoiler of spoilers) {
+		plugin.registerDomEvent(spoiler, 'click', () => {
+			spoiler.classList.toggle("inline_spoilers-revealed");
+		});
+	}
+}
+
+export default class InlineSpoilerPlugin extends Plugin {
+	settings: InlineSpoilerPluginSettings;
 
 	async onload() {
 		await this.loadSettings();
 
-		this.registerEditorExtension(emojiListField);
+		const readingView = document.querySelector(".markdown-reading-view");
+		if (readingView) {
+			updateReadingMode(readingView as HTMLElement, this);
+		}
 
-		this.registerMarkdownPostProcessor((element, context) => {
-			const paragraphs = element.findAll("p");
-
-			for (const paragraph of paragraphs) {
-				const text = paragraph.innerText.trim();
-
-				// find all substrings that start and end with the string "||"
-				const matches = text.match(/\|\|[^|]+\|\|/g);
-
-				console.log(text, matches);
-
-				if (matches) {
-					for (const match of matches) {
-						const spoilerSpan = `<span style="background-color: ${this.settings.showAllSpoilers ? "var(--code-background)" : "var(--text-normal)"}; color: var(--text-normal);" onclick="this.style.backgroundColor='var(--code-background)';">${match.slice(2, -2)}</span>`
-
-						paragraph.innerHTML = paragraph.innerHTML.replace(match, spoilerSpan);
-					}
-				}
-			}
+		this.registerMarkdownPostProcessor((element) => {
+			updateReadingMode(element, this);
 		});
 
 		// This adds an editor command that can perform some operation on the current editor instance
 		this.addCommand({
 			id: 'create-spoiler',
 			name: 'Create spoiler',
-			editorCallback: (editor: Editor, view: MarkdownView) => {
+			editorCallback: (editor: Editor) => {
 				const selection = editor.getSelection();
 				editor.replaceSelection(`||${selection}||`);
 			}
 		});
 
 		// This adds a settings tab so the user can configure various aspects of the plugin
-		this.addSettingTab(new SampleSettingTab(this.app, this));
-
-		// When registering intervals, this function will automatically clear the interval when the plugin is disabled.
-		this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
+		this.addSettingTab(new InlineSpoilerPluginSettingsTab(this.app, this));
 	}
 
 	onunload() {
+		// undo changes to the body
+		document.body.classList.remove("inline_spoilers-revealed");
 
+		// remove all spoilers
+		const spoilers = Array.from(document.querySelectorAll(".inline_spoilers-spoiler"));
+		for (const spoiler of spoilers) {
+			spoiler.outerHTML = `||${spoiler.innerHTML}||`;
+		}
 	}
 
 	async loadSettings() {
 		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+		if (this.settings.showAllSpoilers) {
+			document.body.classList.add("inline_spoilers-revealed");
+		} else {
+			document.body.classList.remove("inline_spoilers-revealed");
+		}
 	}
 
 	async saveSettings() {
@@ -80,51 +94,10 @@ export default class MyPlugin extends Plugin {
 	}
 }
 
-export class EmojiWidget extends WidgetType {
-	toDOM(view: EditorView): HTMLElement {
-		const div = document.createElement("span");
+class InlineSpoilerPluginSettingsTab extends PluginSettingTab {
+	plugin: InlineSpoilerPlugin;
 
-		div.innerText = "👉";
-
-		return div;
-	}
-}
-
-export const emojiListField = StateField.define<DecorationSet>({
-	create(state): DecorationSet {
-		return Decoration.none;
-	},
-	update(oldState: DecorationSet, transaction: Transaction): DecorationSet {
-		const builder = new RangeSetBuilder<Decoration>();
-
-		syntaxTree(transaction.state).iterate({
-			enter(node) {
-				if (node.type.name.startsWith("list")) {
-					// Position of the '-' or the '*'.
-					const listCharFrom = node.from - 2;
-
-					builder.add(
-						listCharFrom,
-						listCharFrom + 1,
-						Decoration.replace({
-							widget: new EmojiWidget(),
-						})
-					);
-				}
-			},
-		});
-
-		return builder.finish();
-	},
-	provide(field: StateField<DecorationSet>): Extension {
-		return EditorView.decorations.from(field);
-	},
-});
-
-class SampleSettingTab extends PluginSettingTab {
-	plugin: MyPlugin;
-
-	constructor(app: App, plugin: MyPlugin) {
+	constructor(app: App, plugin: InlineSpoilerPlugin) {
 		super(app, plugin);
 		this.plugin = plugin;
 	}
@@ -141,6 +114,13 @@ class SampleSettingTab extends PluginSettingTab {
 				.setValue(this.plugin.settings.showAllSpoilers)
 				.onChange(async (value) => {
 					this.plugin.settings.showAllSpoilers = value;
+
+					if (value) {
+						document.body.classList.add("inline_spoilers-revealed");
+					} else {
+						document.body.classList.remove("inline_spoilers-revealed");
+					}
+
 					await this.plugin.saveSettings();
 				}));
 	}
