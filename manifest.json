@@ -1,7 +1,7 @@
 {
 	"id": "inline-spoilers",
 	"name": "Inline spoilers",
-	"version": "0.5.0",
+	"version": "1.0.0",
 	"minAppVersion": "0.15.0",
 	"description": "Implements Discord-like syntax for inline spoilers in Obsidian notes reader mode.",
 	"author": "logonoff",
