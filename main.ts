@@ -85,59 +85,66 @@ const spoilerDecoration = Decoration.mark({
 	tagName: "span",
 });
 
+const spoilerDelimiterDecoration = Decoration.mark({
+	class: "inline_spoilers-editor-spoiler-delimiter",
+	tagName: "span",
+});
+
 class SpoilerEditorPlugin implements PluginValue {
-    decorations: DecorationSet;
+	decorations: DecorationSet;
 
-    constructor(view: EditorView) {
-        this.decorations = this.buildDecorations(view);
-    }
+	constructor(view: EditorView) {
+		this.decorations = this.buildDecorations(view);
+	}
 
-    update(update: ViewUpdate) {
-        if (update.docChanged || update.viewportChanged) {
-            this.decorations = this.buildDecorations(update.view);
-        }
-    }
+	update(update: ViewUpdate) {
+		if (update.docChanged || update.viewportChanged) {
+			this.decorations = this.buildDecorations(update.view);
+		}
+	}
 
-    destroy() { }
+	destroy() { }
 
-    buildDecorations(view: EditorView): DecorationSet {
-        const builder = new RangeSetBuilder<Decoration>();
-        const ranges: { from: number, to: number }[] = [];
+	buildDecorations(view: EditorView): DecorationSet {
+		const builder = new RangeSetBuilder<Decoration>();
+		const ranges: { from: number, to: number, isDelimiter: boolean }[] = [];
 
-        for (const { from, to } of view.visibleRanges) {
-            syntaxTree(view.state).iterate({
-                from,
-                to,
-                enter(node) {
-                    const text = view.state.sliceDoc(node.from, node.to);
-                    let match: RegExpExecArray | null;
+		for (const { from, to } of view.visibleRanges) {
+			syntaxTree(view.state).iterate({
+				from,
+				to,
+				enter(node) {
+					const text = view.state.sliceDoc(node.from, node.to);
+					let match: RegExpExecArray | null;
 
-                    while ((match = SPOILER_REGEX.exec(text)) !== null) {
-                        const from = match.index;
-                        const to = from + match[0].length;
+					while ((match = SPOILER_REGEX.exec(text)) !== null) {
+						const from = match.index;
+						const to = from + match[0].length;
 
-                        const text = view.state.sliceDoc(from, to);
+						const text = view.state.sliceDoc(from, to);
 
-                        if (!text.startsWith("||") && !text.endsWith("||")) {
-                            continue;  // sanity check
-                        }
+						if (!text.startsWith("||") && !text.endsWith("||")) {
+							continue;  // sanity check
+						}
 
-                        ranges.push({ from, to });
-                    }
-                },
-            });
-        }
+						ranges.push({ from, to: from + 2, isDelimiter: true });
+						ranges.push({ from: to - 2, to, isDelimiter: true });
+						ranges.push({ from: from + 2, to: to - 2, isDelimiter: false });
+					}
+				},
+			});
+		}
 
-        // Sort ranges by `from` position to prevent Codemirror error
-        ranges.sort((a, b) => a.from - b.from);
+		// Sort ranges by `from` position to prevent Codemirror error
+		ranges.sort((a, b) => a.from - b.from);
 
-        // Add sorted ranges to the builder
-        for (const range of ranges) {
-            builder.add(range.from, range.to, spoilerDecoration);
-        }
+		// Add sorted ranges to the builder
+		for (const range of ranges) {
+			builder.add(range.from, range.to, range.isDelimiter ? spoilerDelimiterDecoration : spoilerDecoration);
+		}
 
-        return builder.finish();
-    }
+		return builder.finish();
+	}
 }
 
 const pluginSpec: PluginSpec<SpoilerEditorPlugin> = {
@@ -196,7 +203,7 @@ class InlineSpoilerPluginSettingsTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName('Reveal all spoilers')
-			.setDesc('Always show all spoilers, regardless of whether they are clicked or not.')
+			.setDesc('Always show all inline spoilers, regardless of whether they are clicked or not.')
 			.addToggle(toggle => toggle
 				.setValue(this.plugin.settings.showAllSpoilers)
 				.onChange(async (value) => {

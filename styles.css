@@ -27,3 +27,16 @@ available in the app when your plugin is enabled.
     background-color: var(--code-background);
     color: var(--code-normal);
 }
+
+.inline_spoilers-editor-spoiler-delimiter {
+    background-color: var(--code-background);
+	color: var(--text-normal);
+}
+
+.is-live-preview .inline_spoilers-editor-spoiler-delimiter {
+	display: none;
+}
+
+.is-live-preview .cm-active .inline_spoilers-editor-spoiler-delimiter {
+	display: unset;
+}
