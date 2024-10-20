@@ -19,3 +19,7 @@ If you want to combine various formatting options, you can nest them, but make s
 ```
 
 To reveal or hide a spoiler, click on it. You may opt to always show all spoilers by enabling the **Always show spoilers** setting.
+
+
+## Known issues
+- When **Hide spoilers in editor view (experimental)** is enabled, the spoiler text will be visible if it is inside a table cell.

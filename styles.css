@@ -4,12 +4,26 @@ This CSS file will be included with your plugin, and
 available in the app when your plugin is enabled.
 
 */
+/** Reader **/
 .inline_spoilers-spoiler {
     background-color: var(--text-normal);
     color: var(--text-normal);
 }
 
-.inline_spoilers-revealed, .inline_spoilers-revealed .inline_spoilers-spoiler {
+.inline_spoilers-revealed,
+.inline_spoilers-revealed .inline_spoilers-spoiler {
+    background-color: var(--code-background);
+    color: var(--code-normal);
+}
+
+/** Editor **/
+.inline_spoilers-editor-spoiler {
+    background-color: var(--text-normal);
+    color: var(--text-normal);
+}
+
+.cm-active .inline_spoilers-editor-spoiler,
+.inline_spoilers-revealed .inline_spoilers-editor-spoiler {
     background-color: var(--code-background);
     color: var(--code-normal);
 }
