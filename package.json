@@ -1,20 +1,28 @@
 {
 	"name": "obsidian-inline-spoilers",
+	"author": "logonoff",
 	"version": "1.1.0",
+	"private": true,
 	"description": "Adds Discord-like syntax for inline spoilers.",
-	"main": "main.js",
-	"scripts": {
-		"dev": "node esbuild.config.mjs",
-		"build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
-		"version": "node version-bump.mjs && git add manifest.json versions.json"
+	"license": "GPL-3.0-or-later",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/logonoff/obsidian-inline-spoilers"
+	},
+	"bugs": {
+		"url": "https://github.com/logonoff/obsidian-inline-spoilers/issues"
 	},
 	"keywords": [
 		"obsidian",
 		"plugin",
 		"spoilers"
 	],
-	"author": "logonoff <hello@logonoff.co>",
-	"license": "MIT",
+	"main": "main.js",
+	"scripts": {
+		"dev": "node esbuild.config.mjs",
+		"build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
+		"version": "node version-bump.mjs && git add manifest.json versions.json"
+	},
 	"devDependencies": {
 		"@codemirror/language": "^6.10.2",
 		"@codemirror/view": "^6.28.4",
