@@ -1,7 +1,7 @@
 # Inline Spoilers for Obsidian
 This plugin adds support for inline spoilers in [Obsidian](https://obsidian.md) using the `||` syntax.
 
-![Demo gif](https://i.imgur.com/LKqBaug.gif)
+![Demo gif](https://i.imgur.com/YyfMuJt.gif)
 
 ## Usage
 To create an inline spoiler, wrap the text you want to hide in `||`, or by performing the **Inline spoilers: Create spoiler** command. For example:
