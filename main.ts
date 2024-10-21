@@ -9,8 +9,7 @@ import {
 	ViewPlugin,
 	ViewUpdate,
 } from '@codemirror/view';
-import { Editor, Plugin } from 'obsidian';
-import { App, PluginSettingTab, Setting, Workspace } from 'obsidian';
+import { App, Editor, Plugin, PluginSettingTab, Setting, Workspace } from 'obsidian';
 
 const SPOILER_REGEX = /\|\|(.+?)\|\|/g;
 
@@ -118,18 +117,18 @@ class SpoilerEditorPlugin implements PluginValue {
 					let match: RegExpExecArray | null;
 
 					while ((match = SPOILER_REGEX.exec(text)) !== null) {
-						const from = match.index;
-						const to = from + match[0].length;
+						const start = match.index;
+						const end = start + match[0].length;
 
-						const text = view.state.sliceDoc(from, to);
+						const text = view.state.sliceDoc(start, end);
 
 						if (!text.startsWith("||") && !text.endsWith("||")) {
 							continue;  // sanity check
 						}
 
-						ranges.push({ from, to: from + 2, isDelimiter: true });
-						ranges.push({ from: to - 2, to, isDelimiter: true });
-						ranges.push({ from: from + 2, to: to - 2, isDelimiter: false });
+						ranges.push({ from: start, to: start + 2, isDelimiter: true });
+						ranges.push({ from: start + 2, to: end - 2, isDelimiter: false });
+						ranges.push({ from: end - 2, to: end, isDelimiter: true });
 					}
 				},
 			});
