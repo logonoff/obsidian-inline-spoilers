@@ -1,35 +1,35 @@
-/*
-
-This CSS file will be included with your plugin, and
-available in the app when your plugin is enabled.
-
-*/
+/*!
+ * Inline Spoilers for Obsidian
+ * https://github.com/logonoff/obsidian-inline-spoilers
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
 /** Reader **/
 .inline_spoilers-spoiler {
-    background-color: var(--text-normal);
-    color: var(--text-normal);
+	background-color: var(--text-normal);
+	color: var(--text-normal);
 }
 
 .inline_spoilers-revealed,
 .inline_spoilers-revealed .inline_spoilers-spoiler {
-    background-color: var(--code-background);
-    color: var(--code-normal);
+	background-color: var(--code-background);
+	color: var(--code-normal);
 }
 
 /** Editor **/
 .inline_spoilers-editor-spoiler {
-    background-color: var(--text-normal);
-    color: var(--text-normal);
+	background-color: var(--text-normal);
+	color: var(--text-normal);
 }
 
 .cm-active .inline_spoilers-editor-spoiler,
 .inline_spoilers-revealed .inline_spoilers-editor-spoiler {
-    background-color: var(--code-background);
-    color: var(--code-normal);
+	background-color: var(--code-background);
+	color: var(--code-normal);
 }
 
+/** editor - delimiter **/
 .inline_spoilers-editor-spoiler-delimiter {
-    background-color: var(--code-background);
+	background-color: var(--code-background);
 	color: var(--text-normal);
 }
 
@@ -39,4 +39,10 @@ available in the app when your plugin is enabled.
 
 .is-live-preview .cm-active .inline_spoilers-editor-spoiler-delimiter {
 	display: unset;
+}
+
+/** overrides for links **/
+.inline_spoilers-spoiler *:not(.inline_spoilers-revealed .inline_spoilers-spoiler *, .inline_spoilers-revealed *),
+.inline_spoilers-editor-spoiler *:not(.cm-active .inline_spoilers-editor-spoiler *, .inline_spoilers-revealed .inline_spoilers-editor-spoiler *) {
+	color: var(--text-normal) !important;
 }
