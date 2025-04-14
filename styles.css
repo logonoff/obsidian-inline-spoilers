@@ -3,49 +3,57 @@
  * https://github.com/logonoff/obsidian-inline-spoilers
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
-/* colors */
+/* spoiler bar */
 .inline_spoilers-spoiler,
-.inline_spoilers-revealed,
 .inline_spoilers-editor-spoiler,
-.inline_spoilers-editor-spoiler-delimiter { /* obscured */
-	background-color: hsla(var(--accent-h), var(--accent-s), var(--accent-l), 1.0);
-	color: hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.0);
+.inline_spoilers-editor-spoiler-delimiter {
+	/* obscured */
+	background-color: var(--interactive-accent) !important;
+	color: transparent !important;
+
+	> * {
+		/* fix for links */
+		color: transparent !important;
+		text-decoration: none !important;
+	}
 }
 
 .inline_spoilers-revealed,
 .cm-active .inline_spoilers-editor-spoiler,
-.cm-active .inline_spoilers-editor-spoiler-delimiter { /* revealed */
-	background-color: hsla(var(--accent-h), var(--accent-s), var(--accent-l), calc(1.0/5));
-	color: hsla(var(--accent-h), var(--accent-s), var(--accent-l), 1.0);
+.cm-active .inline_spoilers-editor-spoiler-delimiter {
+	/* revealed */
+	background-color: hsla(var(--color-accent-hsl), 0.075) !important;
+	color: var(--text-accent) !important;
+
+	> * {
+		/* fix for links */
+		color: var(--text-accent) !important;
+		text-decoration: unset !important;
+	}
 }
 
 /* reader */
 .inline_spoilers-spoiler {
-	border-radius: 0.2em;
-	padding: 0 0.2em;
+	border-radius: var(--radius-s);
 }
 
 /* editor */
-:not(.is-live-preview) .inline_spoilers-editor-spoiler,
-:is(.is-live-preview) .cm-active .inline_spoilers-editor-spoiler {
-	border-radius: 0em;
-	padding: 0 0.2em;
+.is-live-preview .inline_spoilers-editor-spoiler {
+	border-radius: var(--radius-s);
 }
 
-:is(.is-live-preview) .inline_spoilers-editor-spoiler {
-	border-radius: 0.2em;
-	padding: 0 0.8em;
+.is-live-preview .cm-active .inline_spoilers-editor-spoiler {
+	/* contiguous border radius with the delimiter */
+	border-radius: 0em;
 }
 
 /* delimiter */
 .cm-line .inline_spoilers-editor-spoiler-delimiter {
 	&:has(+ .inline_spoilers-editor-spoiler) {
-		border-radius: 0.2em 0 0 0.2em;
-		padding-left: 0.2em;
+		border-radius: var(--radius-s) 0 0 var(--radius-s);
 	}
 	&:is(.inline_spoilers-editor-spoiler + .inline_spoilers-editor-spoiler-delimiter) {
-		border-radius: 0 0.2em 0.2em 0;
-		padding-right: 0.2em;
+		border-radius: 0 var(--radius-s) var(--radius-s) 0;
 	}
 }
 
@@ -55,10 +63,4 @@
 
 .is-live-preview .cm-active .inline_spoilers-editor-spoiler-delimiter {
 	display: unset;
-}
-
-/** overrides for links **/
-.inline_spoilers-spoiler *:not(.inline_spoilers-revealed .inline_spoilers-spoiler *, .inline_spoilers-revealed *),
-.inline_spoilers-editor-spoiler *:not(.cm-active .inline_spoilers-editor-spoiler *, .inline_spoilers-revealed .inline_spoilers-editor-spoiler *) {
-	color: var(--text-normal) !important;
 }
