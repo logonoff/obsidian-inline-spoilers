@@ -20,7 +20,11 @@
 
 .inline_spoilers-revealed,
 .cm-active .inline_spoilers-editor-spoiler,
-.cm-active .inline_spoilers-editor-spoiler-delimiter {
+.cm-active .inline_spoilers-editor-spoiler-delimiter,
+
+.inline_spoilers-revealed .inline_spoilers-spoiler,
+.inline_spoilers-revealed .inline_spoilers-editor-spoiler,
+.inline_spoilers-revealed .inline_spoilers-editor-spoiler-delimiter {
 	/* revealed */
 	background-color: hsla(var(--color-accent-hsl), 0.075) !important;
 	color: var(--text-accent) !important;
