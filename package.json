@@ -1,7 +1,7 @@
 {
 	"name": "obsidian-inline-spoilers",
 	"author": "logonoff",
-	"version": "1.2.0",
+	"version": "1.2.1",
 	"private": true,
 	"description": "Adds Discord-like syntax for inline spoilers.",
 	"license": "GPL-3.0-or-later",
