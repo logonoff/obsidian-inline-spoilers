@@ -236,7 +236,7 @@ class InlineSpoilerPluginSettingsTab extends PluginSettingTab {
  * Obsidian plugin interface
  */
 export default class InlineSpoilerPlugin extends Plugin {
-	settings: InlineSpoilerPluginSettings;
+	settings!: InlineSpoilerPluginSettings;
 
 	async onload() {
 		await this.loadSettings();
