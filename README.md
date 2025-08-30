@@ -28,4 +28,4 @@ Please report any bugs or request features on the [GitHub issues page](https://g
 
 ## License
 
-[GPL-3.0-or-later](./LICENCE.md)
+[GPL-3.0-or-later](./LICENSE.md)
