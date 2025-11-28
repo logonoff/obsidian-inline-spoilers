@@ -3,17 +3,27 @@
  * https://github.com/logonoff/obsidian-inline-spoilers
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
+body {
+	--inline-spoilers-hidden-foreground: transparent;
+	--inline-spoilers-hidden-background: var(--interactive-accent);
+
+	--inline-spoilers-revealed-foreground: var(--text-accent);
+	--inline-spoilers-revealed-background: hsla(var(--color-accent-hsl), 0.075);
+
+	--inline-spoilers-spoiler-radius: var(--radius-s);
+}
+
 /* spoiler bar */
 .inline_spoilers-spoiler,
 .inline_spoilers-editor-spoiler,
 .inline_spoilers-editor-spoiler-delimiter {
 	/* obscured */
-	background-color: var(--interactive-accent) !important;
-	color: transparent !important;
+	background-color: var(--inline-spoilers-hidden-background) !important;
+	color: var(--inline-spoilers-hidden-foreground) !important;
 
 	> * {
 		/* fix for links */
-		color: transparent !important;
+		color: var(--inline-spoilers-hidden-foreground) !important;
 		text-decoration: none !important;
 	}
 }
@@ -26,24 +36,24 @@
 .inline_spoilers-revealed .inline_spoilers-editor-spoiler,
 .inline_spoilers-revealed .inline_spoilers-editor-spoiler-delimiter {
 	/* revealed */
-	background-color: hsla(var(--color-accent-hsl), 0.075) !important;
-	color: var(--text-accent) !important;
+	background-color: var(--inline-spoilers-revealed-background) !important;
+	color: var(--inline-spoilers-revealed-foreground) !important;
 
 	> * {
 		/* fix for links */
-		color: var(--text-accent) !important;
+		color: var(--inline-spoilers-revealed-foreground) !important;
 		text-decoration: unset !important;
 	}
 }
 
 /* reader */
 .inline_spoilers-spoiler {
-	border-radius: var(--radius-s);
+	border-radius: var(--inline-spoilers-spoiler-radius);
 }
 
 /* editor */
 .is-live-preview .inline_spoilers-editor-spoiler {
-	border-radius: var(--radius-s);
+	border-radius: var(--inline-spoilers-spoiler-radius);
 }
 
 .is-live-preview .cm-active .inline_spoilers-editor-spoiler {
@@ -54,10 +64,10 @@
 /* delimiter */
 .cm-line .inline_spoilers-editor-spoiler-delimiter {
 	&:has(+ .inline_spoilers-editor-spoiler) {
-		border-radius: var(--radius-s) 0 0 var(--radius-s);
+		border-radius: var(--inline-spoilers-spoiler-radius) 0 0 var(--inline-spoilers-spoiler-radius);
 	}
 	&:is(.inline_spoilers-editor-spoiler + .inline_spoilers-editor-spoiler-delimiter) {
-		border-radius: 0 var(--radius-s) var(--radius-s) 0;
+		border-radius: 0 var(--inline-spoilers-spoiler-radius) var(--inline-spoilers-spoiler-radius) 0;
 	}
 }
 
