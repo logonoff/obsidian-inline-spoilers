@@ -28,6 +28,8 @@ const processNode = (node: Node) => {
 			if (SPOILER_REGEX.test(part)) {
 				// It's a spoiler, create a span for it
 				const spoilerText = part.slice(2, -2); // Remove the || delimiters
+				// obsidian global helper
+				// eslint-disable-next-line no-undef
 				const spoilerSpan = createSpan({ cls: "inline_spoilers-spoiler", text: spoilerText });
 				fragment.appendChild(spoilerSpan);
 			} else {
@@ -64,7 +66,7 @@ const updateReadingMode = (element: HTMLElement, plugin: InlineSpoilerPlugin) =>
 
 const unloadReadingMode = (workspace: Workspace) => {
 	// remove all spoilers from reader mode
-	const spoilers = Array.from(workspace.containerEl.querySelectorAll(".inline_spoilers-spoiler")) as HTMLElement[];
+	const spoilers = Array.from(workspace.containerEl.querySelectorAll<HTMLElement>(".inline_spoilers-spoiler"));
 	for (const spoiler of spoilers) {
 		const parent = spoiler.parentNode;
 		const spoilerText = document.createTextNode(`||${spoiler.innerText}||`);
@@ -273,7 +275,7 @@ export default class InlineSpoilerPlugin extends Plugin {
 	}
 
 	async loadSettings() {
-		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData() as Partial<InlineSpoilerPluginSettings>);
 		this.app.workspace.containerEl.toggleClass("inline_spoilers-revealed", this.settings.showAllSpoilers);
 		if (this.settings.enableEditorMode) {
 			editorPlugins.push(spoilerEditorPlugin);
