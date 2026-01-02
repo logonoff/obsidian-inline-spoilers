@@ -20,29 +20,22 @@ body {
 	/* obscured */
 	background-color: var(--inline-spoilers-hidden-background) !important;
 	color: var(--inline-spoilers-hidden-foreground) !important;
-
-	> * {
-		/* fix for links */
-		color: var(--inline-spoilers-hidden-foreground) !important;
-		text-decoration: none !important;
-	}
 }
 
+/** used when a hidden spoiler is revealed by clicking in reader mode */
+.inline_spoilers-spoiler.inline_spoilers-revealed,
+
+/** used when a hidden spoiler is revealed in editor mode */
 .cm-active .inline_spoilers-editor-spoiler,
 .cm-active .inline_spoilers-editor-spoiler-delimiter,
 
+/** used when a hidden spoiler is revealed using "Reveal all spoilers" */
 .inline_spoilers-revealed .inline_spoilers-spoiler,
 .inline_spoilers-revealed .inline_spoilers-editor-spoiler,
 .inline_spoilers-revealed .inline_spoilers-editor-spoiler-delimiter {
 	/* revealed */
 	background-color: var(--inline-spoilers-revealed-background) !important;
 	color: var(--inline-spoilers-revealed-foreground) !important;
-
-	> * {
-		/* fix for links */
-		color: var(--inline-spoilers-revealed-foreground) !important;
-		text-decoration: unset !important;
-	}
 }
 
 /* reader */
