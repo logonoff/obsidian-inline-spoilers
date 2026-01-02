@@ -13,15 +13,25 @@ body {
 	--inline-spoilers-spoiler-radius: var(--radius-s);
 }
 
-/* spoiler bar */
+/**
+ * hidden spoilers
+ */
+/** used in reader mode */
 .inline_spoilers-spoiler,
+
+/** used in spoiler content in editor mode */
 .inline_spoilers-editor-spoiler,
+
+/** used in delimiter in editor mode */
 .inline_spoilers-editor-spoiler-delimiter {
 	/* obscured */
 	background-color: var(--inline-spoilers-hidden-background) !important;
 	color: var(--inline-spoilers-hidden-foreground) !important;
 }
 
+/**
+ * revealed spoilers
+ */
 /** used when a hidden spoiler is revealed by clicking in reader mode */
 .inline_spoilers-spoiler.inline_spoilers-revealed,
 
@@ -33,27 +43,31 @@ body {
 .inline_spoilers-revealed .inline_spoilers-spoiler,
 .inline_spoilers-revealed .inline_spoilers-editor-spoiler,
 .inline_spoilers-revealed .inline_spoilers-editor-spoiler-delimiter {
-	/* revealed */
 	background-color: var(--inline-spoilers-revealed-background) !important;
 	color: var(--inline-spoilers-revealed-foreground) !important;
 }
 
-/* reader */
+/**
+ * spoiler border radius
+ */
+/* reader mode always shows one contiguous spoiler with rounded corners */
 .inline_spoilers-spoiler {
 	border-radius: var(--inline-spoilers-spoiler-radius);
 }
 
-/* editor */
+/* editor mode, when a spoiler is hidden, does not display delimiters (||) */
 .is-live-preview .inline_spoilers-editor-spoiler {
 	border-radius: var(--inline-spoilers-spoiler-radius);
 }
 
+/* editor mode, when a spoiler is revealed, display delimiters */
 .is-live-preview .cm-active .inline_spoilers-editor-spoiler {
 	/* contiguous border radius with the delimiter */
 	border-radius: 0em;
 }
 
-/* delimiter */
+/* editor mode, when a spoiler is revealed, display delimiters, which should have
+   contiguous border radius with the spoiler content */
 .cm-line .inline_spoilers-editor-spoiler-delimiter {
 	&:has(+ .inline_spoilers-editor-spoiler) {
 		border-radius: var(--inline-spoilers-spoiler-radius) 0 0 var(--inline-spoilers-spoiler-radius);
@@ -63,10 +77,12 @@ body {
 	}
 }
 
+/** hide spoiler delimiters in editor mode when spoilers are hidden */
 .is-live-preview .inline_spoilers-editor-spoiler-delimiter {
 	display: none;
 }
 
+/** reveal spoiler delimiters in editor mode when a spoiler is revealed */
 .is-live-preview .cm-active .inline_spoilers-editor-spoiler-delimiter {
 	display: unset;
 }

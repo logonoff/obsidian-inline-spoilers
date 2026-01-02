@@ -1,13 +1,13 @@
-import globals from "globals";
 import js from "@eslint/js";
-import obsidianmd from "eslint-plugin-obsidianmd";
-import ts from "typescript-eslint";
+import obsidian from "eslint-plugin-obsidianmd";
 import { defineConfig, globalIgnores } from "eslint/config";
+import globals from "globals";
+import ts from "typescript-eslint";
 
 export default defineConfig(
 	js.configs.recommended,
 	...ts.configs.recommended,
-	...obsidianmd.configs.recommended,
+	...obsidian.configs.recommended,
 	{
 		languageOptions: {
 			globals: {
