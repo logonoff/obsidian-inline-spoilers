@@ -11,7 +11,11 @@ import {
 } from '@codemirror/view';
 import { App, Editor, Plugin, PluginSettingTab, Setting, Workspace } from 'obsidian';
 
+/** Regex to match ||spoiler|| syntax */
 const SPOILER_REGEX = /\|\|(.+?)\|\|/g;
+
+/** Allowed HTML tags to process for spoilers */
+const TAGS = "p, li, h1, h2, h3, h4, h5, h6, blockquote, em, strong, b, i, a, th, td"
 
 /*
  * Reading mode
@@ -48,7 +52,7 @@ const processNode = (node: Node) => {
 }
 
 const updateReadingMode = (element: HTMLElement, plugin: InlineSpoilerPlugin) => {
-	const allowedElems = element.findAll("p, li, h1, h2, h3, h4, h5, h6, blockquote, em, strong, b, i, a, th, td");
+	const allowedElems = element.findAll(TAGS);
 
 	for (const elem of allowedElems) {
 		// Process each child node of the element
@@ -67,9 +71,11 @@ const updateReadingMode = (element: HTMLElement, plugin: InlineSpoilerPlugin) =>
 const unloadReadingMode = (workspace: Workspace) => {
 	// remove all spoilers from reader mode
 	const spoilers = Array.from(workspace.containerEl.querySelectorAll<HTMLElement>(".inline_spoilers-spoiler"));
+
 	for (const spoiler of spoilers) {
 		const parent = spoiler.parentNode;
 		const spoilerText = document.createTextNode(`||${spoiler.innerText}||`);
+
 		if (parent) {
 			parent.replaceChild(spoilerText, spoiler);
 		}
@@ -81,11 +87,13 @@ const unloadReadingMode = (workspace: Workspace) => {
 /*
  * Editor mode
  */
+/** The spoiler content between the `||` delimiters */
 const spoilerDecoration = Decoration.mark({
 	class: "inline_spoilers-editor-spoiler",
 	tagName: "span",
 });
 
+/** The `||` delimiters */
 const spoilerDelimiterDecoration = Decoration.mark({
 	class: "inline_spoilers-editor-spoiler-delimiter",
 	tagName: "span",

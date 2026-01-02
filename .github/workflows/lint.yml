@@ -1,9 +1,10 @@
-name: Release Obsidian plugin
+name: Lint Obsidian plugin
 
 on:
   push:
-    tags:
-      - "*"
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
 
 jobs:
   build:
@@ -23,13 +24,5 @@ jobs:
           npm clean-install --ignore-scripts
           npm run build
 
-      - name: Create release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          tag="${GITHUB_REF#refs/tags/}"
-
-          gh release create "$tag" \
-            --title="$tag" \
-            --draft \
-            main.js manifest.json styles.css
+      - name: Lint code
+        run: npm run lint
