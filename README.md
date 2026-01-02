@@ -33,8 +33,9 @@ by enabling the **Always show spoilers** setting.
 
 ## Theming
 
-There are several CSS variables and CSS classes you may use a CSS snippet to override
-to customize the appearance of spoilers, without needing to modify the plugin.
+There are CSS variables and classes you can use to style spoilers to your liking.
+These can be used in a CSS snippet to override to customize the appearance of spoilers,
+without needing to modify the plugin.
 
 Refer to the [styles.css] file for more details.
 
