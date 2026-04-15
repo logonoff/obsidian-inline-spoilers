@@ -29,6 +29,11 @@ body {
 	color: var(--inline-spoilers-hidden-foreground) !important;
 }
 
+/** ensure all descendants inside a hidden spoiler are also hidden (e.g. links, math) */
+.inline_spoilers-spoiler * {
+	color: var(--inline-spoilers-hidden-foreground) !important;
+}
+
 /**
  * revealed spoilers
  */
@@ -44,6 +49,12 @@ body {
 .inline_spoilers-revealed .inline_spoilers-editor-spoiler,
 .inline_spoilers-revealed .inline_spoilers-editor-spoiler-delimiter {
 	background-color: var(--inline-spoilers-revealed-background) !important;
+	color: var(--inline-spoilers-revealed-foreground) !important;
+}
+
+/** ensure descendants are also revealed when the spoiler is revealed */
+.inline_spoilers-spoiler.inline_spoilers-revealed *,
+.inline_spoilers-revealed .inline_spoilers-spoiler * {
 	color: var(--inline-spoilers-revealed-foreground) !important;
 }
 
