@@ -1,7 +1,6 @@
 import js from "@eslint/js";
 import obsidian from "eslint-plugin-obsidianmd";
 import { defineConfig, globalIgnores } from "eslint/config";
-import globals from "globals";
 import ts from "typescript-eslint";
 
 export default defineConfig(
@@ -9,10 +8,11 @@ export default defineConfig(
 	...ts.configs.recommended,
 	...obsidian.configs.recommended,
 	{
+		rules: {
+			// https://typescript-eslint.io/troubleshooting/faqs/eslint
+			"no-undef": "off",
+		},
 		languageOptions: {
-			globals: {
-				...globals.browser,
-			},
 			parserOptions: {
 				projectService: {
 					allowDefaultProject: [

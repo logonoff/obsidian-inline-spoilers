@@ -26,19 +26,18 @@ const processNode = (node: Node) => {
 
 		// Split the text node content by the spoiler pattern, keeping the delimiters
 		const parts = node.textContent.split(/(\|\|[^|]+\|\|)/g);
-		const fragment = document.createDocumentFragment();
+		const fragment = createFragment();
 
 		for (const part of parts) {
 			if (SPOILER_REGEX.test(part)) {
 				// It's a spoiler, create a span for it
 				const spoilerText = part.slice(2, -2); // Remove the || delimiters
 				// obsidian global helper
-				// eslint-disable-next-line no-undef
 				const spoilerSpan = createSpan({ cls: "inline_spoilers-spoiler", text: spoilerText });
 				fragment.appendChild(spoilerSpan);
 			} else {
 				// It's regular text, create a text node for it
-				const textNode = document.createTextNode(part);
+				const textNode = activeDocument.createTextNode(part);
 				fragment.appendChild(textNode);
 			}
 		}
@@ -74,7 +73,7 @@ const unloadReadingMode = (workspace: Workspace) => {
 
 	for (const spoiler of spoilers) {
 		const parent = spoiler.parentNode;
-		const spoilerText = document.createTextNode(`||${spoiler.innerText}||`);
+		const spoilerText = activeDocument.createTextNode(`||${spoiler.innerText}||`);
 
 		if (parent) {
 			parent.replaceChild(spoilerText, spoiler);
