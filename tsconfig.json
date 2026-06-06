@@ -2,19 +2,14 @@
   "compilerOptions": {
     "inlineSourceMap": true,
     "inlineSources": true,
-    "module": "ESNext",
-    "target": "ES6",
+    "module": "esnext",
+    "target": "es2021",
     "allowJs": false,
     "noImplicitAny": true,
     "importHelpers": true,
     "isolatedModules": true,
     "strict": true,
-    "lib": [
-      "DOM",
-      "ES5",
-      "ES6",
-      "ES7"
-    ]
+    "lib": ["es2021", "DOM"]
   },
   "include": [
     "**/*.ts"

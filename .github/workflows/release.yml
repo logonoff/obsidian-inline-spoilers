@@ -8,6 +8,10 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
 
     steps:
       - uses: actions/checkout@v6
@@ -22,6 +26,13 @@ jobs:
         run: |
           npm clean-install --ignore-scripts
           npm run build
+
+      - name: Attest build provenance
+        uses: actions/attest@v4
+        with:
+          subject-path: |
+            main.js
+            styles.css
 
       - name: Create release
         env:
