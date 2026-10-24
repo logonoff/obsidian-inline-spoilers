@@ -11,6 +11,13 @@ body {
 	--inline-spoilers-revealed-background: hsla(var(--color-accent-hsl), 0.075);
 
 	--inline-spoilers-spoiler-radius: var(--radius-s);
+
+	/* used by the "blur" spoiler style instead of the hidden colours */
+	--inline-spoilers-filtered-foreground: var(--inline-spoilers-revealed-foreground);
+	--inline-spoilers-filtered-background: var(--inline-spoilers-revealed-background);
+
+	/* set by the plugin from the "Blur strength" setting */
+	--inline-spoilers-blur-radius: 4px;
 }
 
 /**
@@ -30,6 +37,19 @@ body {
 }
 
 /**
+ * blurred spoilers keep their text visible, but run it through a filter
+ */
+.inline_spoilers-style-blur :is(
+	.inline_spoilers-spoiler,
+	.inline_spoilers-editor-spoiler,
+	.inline_spoilers-editor-spoiler-delimiter
+) {
+	background-color: var(--inline-spoilers-filtered-background) !important;
+	color: var(--inline-spoilers-filtered-foreground) !important;
+	filter: blur(var(--inline-spoilers-blur-radius));
+}
+
+/**
  * revealed spoilers
  */
 /** used when a hidden spoiler is revealed by clicking in reader mode */
@@ -45,6 +65,7 @@ body {
 .inline_spoilers-revealed .inline_spoilers-editor-spoiler-delimiter {
 	background-color: var(--inline-spoilers-revealed-background) !important;
 	color: var(--inline-spoilers-revealed-foreground) !important;
+	filter: none;
 }
 
 /**
