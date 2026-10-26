@@ -50,8 +50,7 @@ body {
 .inline_spoilers-style-blur {
 	& .inline_spoilers-spoiler,
 	& .inline_spoilers-editor-spoiler,
-	& .inline_spoilers-editor-spoiler-delimiter
-	{
+	& .inline_spoilers-editor-spoiler-delimiter {
 		background-color: var(--inline-spoilers-revealed-background);
 		color: var(--inline-spoilers-revealed-foreground);
 		filter: var(--inline-spoilers-blur-filter, var(--blur-s));
@@ -108,10 +107,15 @@ body {
    contiguous border radius with the spoiler content */
 .cm-line .inline_spoilers-editor-spoiler-delimiter {
 	&:has(+ .inline_spoilers-editor-spoiler) {
-		border-radius: var(--inline-spoilers-spoiler-radius) 0 0 var(--inline-spoilers-spoiler-radius);
+		border-radius: var(--inline-spoilers-spoiler-radius) 0 0
+			var(--inline-spoilers-spoiler-radius);
 	}
-	&:is(.inline_spoilers-editor-spoiler + .inline_spoilers-editor-spoiler-delimiter) {
-		border-radius: 0 var(--inline-spoilers-spoiler-radius) var(--inline-spoilers-spoiler-radius) 0;
+	&:is(
+		.inline_spoilers-editor-spoiler
+			+ .inline_spoilers-editor-spoiler-delimiter
+	) {
+		border-radius: 0 var(--inline-spoilers-spoiler-radius)
+			var(--inline-spoilers-spoiler-radius) 0;
 	}
 }
 

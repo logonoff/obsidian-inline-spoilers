@@ -4,7 +4,6 @@
 
 ||asdasdasd **asdasd** asd a asd||
 
-
 [visible link](https://google.com)
 
 [before ||secret|| after](https://google.com)
@@ -15,22 +14,21 @@
 | col 2 is |     **centered**     |   $12 |
 | col 3 is | \|\|inside table\|\| |    $1 |
 
-
 - sdasfdi
 - asdfsadfasdfsadf
 - sadf ||a||
 
-#  ||heading level 1||
+# ||heading level 1||
 
 hello, my name is the **quick ||brown|| fox**
 
 ## ||heading level 2||
 
-today ||i *am* going to **talk**|| about a *really ||lazy dog|| haha*
+today ||i _am_ going to **talk**|| about a _really ||lazy dog|| haha_
 
 ### ||heading level 3||
 
-me and the **||lazy dogs||** when they *||quick brown fox||*
+me and the **||lazy dogs||** when they _||quick brown fox||_
 
 #### ||heading level 4||
 
@@ -49,7 +47,6 @@ correct ||horse battery|| staple
 
 [||this is yahoo guys||](https://google.com)
 [before ||secret|| after](https://google.com)
-
 
 || $\{1, 3, 5, 7, \dots\}$ ||
 || forks $\subset$ utensils ||

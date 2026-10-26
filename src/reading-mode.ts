@@ -1,8 +1,14 @@
-import { MarkdownView, type MarkdownPostProcessorContext, type Plugin, type Workspace } from 'obsidian';
+import {
+	MarkdownView,
+	type MarkdownPostProcessorContext,
+	type Plugin,
+	type Workspace,
+} from 'obsidian';
 import { findDelimiterPairs, findEscapedDelimiters } from './spoiler-syntax';
 
 /** Allowed HTML tags to process for spoilers */
-const TAGS = "p, li, h1, h2, h3, h4, h5, h6, blockquote, em, strong, b, i, a, th, td"
+const TAGS =
+	'p, li, h1, h2, h3, h4, h5, h6, blockquote, em, strong, b, i, a, th, td';
 
 /*
  * Reading mode
@@ -12,7 +18,10 @@ const TAGS = "p, li, h1, h2, h3, h4, h5, h6, blockquote, em, strong, b, i, a, th
  * within the parent's concatenated textContent, and returns the child node
  * along with the local offset within that child's textContent.
  */
-const findChildAtOffset = (parent: Node, offset: number): { node: Node, localOffset: number } | null => {
+const findChildAtOffset = (
+	parent: Node,
+	offset: number,
+): { node: Node; localOffset: number } | null => {
 	let cumulative = 0;
 	for (const child of Array.from(parent.childNodes)) {
 		const len = child.textContent?.length ?? 0;
@@ -22,36 +31,55 @@ const findChildAtOffset = (parent: Node, offset: number): { node: Node, localOff
 		cumulative += len;
 	}
 	return null;
-}
+};
 
 export const rerenderExistingReadingView = (workspace: Workspace) => {
-	const readingView = workspace.containerEl.querySelector('.markdown-reading-view');
+	const readingView = workspace.containerEl.querySelector(
+		'.markdown-reading-view',
+	);
 	if (!readingView) return;
 
-	workspace.iterateAllLeaves(leaf => {
+	workspace.iterateAllLeaves((leaf) => {
 		const view = leaf.view;
-		if (view instanceof MarkdownView && view.getMode() === 'preview' && view.containerEl.contains(readingView)) {
+		if (
+			view instanceof MarkdownView &&
+			view.getMode() === 'preview' &&
+			view.containerEl.contains(readingView)
+		) {
 			view.previewMode.rerender(true);
 		}
 	});
 };
 
-const processElement = (element: Node, escapedDelimiters: Set<number>, delimiterCounter: { value: number }, processedElements: WeakSet<Node>) => {
+const processElement = (
+	element: Node,
+	escapedDelimiters: Set<number>,
+	delimiterCounter: { value: number },
+	processedElements: WeakSet<Node>,
+) => {
 	if (element.nodeType !== Node.ELEMENT_NODE) return;
 	if (processedElements.has(element)) return;
 	processedElements.add(element);
 
 	// Don't process nodes that are already spoiler spans
-	if (element.instanceOf(HTMLElement) && element.classList.contains("inline_spoilers-spoiler")) return;
+	if (
+		element.instanceOf(HTMLElement) &&
+		element.classList.contains('inline_spoilers-spoiler')
+	)
+		return;
 
-	const fullText = element.textContent ?? "";
-	if (!fullText.includes("||")) return;
+	const fullText = element.textContent ?? '';
+	if (!fullText.includes('||')) return;
 
 	// Save counter state so we can replay it for the actual processing
 	const savedCounter = delimiterCounter.value;
 
 	// Find all valid (non-escaped) spoiler matches
-	const validMatches = findDelimiterPairs(fullText, escapedDelimiters, delimiterCounter);
+	const validMatches = findDelimiterPairs(
+		fullText,
+		escapedDelimiters,
+		delimiterCounter,
+	);
 	const scannedCounter = delimiterCounter.value;
 
 	if (validMatches.length === 0) {
@@ -60,18 +88,31 @@ const processElement = (element: Node, escapedDelimiters: Set<number>, delimiter
 		delimiterCounter.value = savedCounter;
 		for (const child of Array.from(element.childNodes)) {
 			if (child.nodeType === Node.ELEMENT_NODE) {
-				processElement(child, escapedDelimiters, delimiterCounter, processedElements);
+				processElement(
+					child,
+					escapedDelimiters,
+					delimiterCounter,
+					processedElements,
+				);
 			}
 		}
-		delimiterCounter.value = Math.max(delimiterCounter.value, scannedCounter);
+		delimiterCounter.value = Math.max(
+			delimiterCounter.value,
+			scannedCounter,
+		);
 		return;
 	}
 
 	// Check if all matches fall within single text nodes (simple case)
-	const allInTextNodes = validMatches.every(m => {
+	const allInTextNodes = validMatches.every((m) => {
 		const startInfo = findChildAtOffset(element, m.start);
 		const endInfo = findChildAtOffset(element, m.end - 1);
-		return startInfo && endInfo && startInfo.node === endInfo.node && startInfo.node.nodeType === Node.TEXT_NODE;
+		return (
+			startInfo &&
+			endInfo &&
+			startInfo.node === endInfo.node &&
+			startInfo.node.nodeType === Node.TEXT_NODE
+		);
 	});
 
 	if (allInTextNodes) {
@@ -84,10 +125,18 @@ const processElement = (element: Node, escapedDelimiters: Set<number>, delimiter
 			if (child.nodeType === Node.TEXT_NODE) {
 				processTextNode(child, escapedDelimiters, delimiterCounter);
 			} else if (child.nodeType === Node.ELEMENT_NODE) {
-				processElement(child, escapedDelimiters, delimiterCounter, processedElements);
+				processElement(
+					child,
+					escapedDelimiters,
+					delimiterCounter,
+					processedElements,
+				);
 			}
 		}
-		delimiterCounter.value = Math.max(delimiterCounter.value, scannedCounter);
+		delimiterCounter.value = Math.max(
+			delimiterCounter.value,
+			scannedCounter,
+		);
 		return;
 	}
 
@@ -106,7 +155,10 @@ const processElement = (element: Node, escapedDelimiters: Set<number>, delimiter
 
 		// Split the starting text node if the || delimiter doesn't start at the beginning
 		let firstWrappedNode = startNode;
-		if (startNode.nodeType === Node.TEXT_NODE && startInfo.localOffset > 0) {
+		if (
+			startNode.nodeType === Node.TEXT_NODE &&
+			startInfo.localOffset > 0
+		) {
 			(startNode as Text).splitText(startInfo.localOffset);
 			firstWrappedNode = startNode.nextSibling!;
 		}
@@ -115,7 +167,7 @@ const processElement = (element: Node, escapedDelimiters: Set<number>, delimiter
 		let lastWrappedNode = endNode;
 		if (endNode.nodeType === Node.TEXT_NODE) {
 			const endLocalOffset = endInfo.localOffset + 1;
-			const endText = endNode.textContent ?? "";
+			const endText = endNode.textContent ?? '';
 			if (endLocalOffset < endText.length) {
 				(endNode as Text).splitText(endLocalOffset);
 				lastWrappedNode = endNode;
@@ -133,7 +185,7 @@ const processElement = (element: Node, escapedDelimiters: Set<number>, delimiter
 
 		if (nodesToWrap.length === 0) continue;
 
-		const spoilerSpan = createSpan({ cls: "inline_spoilers-spoiler" });
+		const spoilerSpan = createSpan({ cls: 'inline_spoilers-spoiler' });
 
 		// Insert the spoiler span before the first node to wrap
 		element.insertBefore(spoilerSpan, nodesToWrap[0]);
@@ -145,34 +197,64 @@ const processElement = (element: Node, escapedDelimiters: Set<number>, delimiter
 
 		// Remove the leading || from the first child
 		const firstChild = spoilerSpan.firstChild;
-		if (firstChild && firstChild.nodeType === Node.TEXT_NODE && firstChild.textContent) {
-			firstChild.textContent = firstChild.textContent.replace(/^\|\|/, "");
+		if (
+			firstChild &&
+			firstChild.nodeType === Node.TEXT_NODE &&
+			firstChild.textContent
+		) {
+			firstChild.textContent = firstChild.textContent.replace(
+				/^\|\|/,
+				'',
+			);
 		}
 
 		// Remove the trailing || from the last child
 		const lastChild = spoilerSpan.lastChild;
-		if (lastChild && lastChild.nodeType === Node.TEXT_NODE && lastChild.textContent) {
-			lastChild.textContent = lastChild.textContent.replace(/\|\|$/, "");
+		if (
+			lastChild &&
+			lastChild.nodeType === Node.TEXT_NODE &&
+			lastChild.textContent
+		) {
+			lastChild.textContent = lastChild.textContent.replace(/\|\|$/, '');
 		}
 	}
 
 	// Recurse into any remaining non-spoiler child elements
 	for (const child of Array.from(element.childNodes)) {
-		if (child.nodeType === Node.ELEMENT_NODE && !(child.instanceOf(HTMLElement) && child.classList.contains("inline_spoilers-spoiler"))) {
-			processElement(child, escapedDelimiters, delimiterCounter, processedElements);
+		if (
+			child.nodeType === Node.ELEMENT_NODE &&
+			!(
+				child.instanceOf(HTMLElement) &&
+				child.classList.contains('inline_spoilers-spoiler')
+			)
+		) {
+			processElement(
+				child,
+				escapedDelimiters,
+				delimiterCounter,
+				processedElements,
+			);
 		}
 	}
-}
+};
 
 /**
  * Processes a single text node, splitting it by ||spoiler|| patterns and
  * wrapping matched segments in spoiler spans.
  */
-const processTextNode = (node: Node, escapedDelimiters: Set<number>, delimiterCounter: { value: number }) => {
+const processTextNode = (
+	node: Node,
+	escapedDelimiters: Set<number>,
+	delimiterCounter: { value: number },
+) => {
 	if (!node.textContent || !node.parentNode) return;
 
 	const text = node.textContent;
-	const validMatches = findDelimiterPairs(text, escapedDelimiters, delimiterCounter);
+	const validMatches = findDelimiterPairs(
+		text,
+		escapedDelimiters,
+		delimiterCounter,
+	);
 
 	if (validMatches.length === 0) return;
 
@@ -182,12 +264,17 @@ const processTextNode = (node: Node, escapedDelimiters: Set<number>, delimiterCo
 	for (const { start, end } of validMatches) {
 		// Add any text before this match
 		if (start > lastIndex) {
-			fragment.appendChild(document.createTextNode(text.slice(lastIndex, start)));
+			fragment.appendChild(
+				document.createTextNode(text.slice(lastIndex, start)),
+			);
 		}
 
 		// Create the spoiler span (strip the || delimiters)
 		const spoilerText = text.slice(start + 2, end - 2);
-		const spoilerSpan = createSpan({ cls: "inline_spoilers-spoiler", text: spoilerText });
+		const spoilerSpan = createSpan({
+			cls: 'inline_spoilers-spoiler',
+			text: spoilerText,
+		});
 		fragment.appendChild(spoilerSpan);
 
 		lastIndex = end;
@@ -200,9 +287,13 @@ const processTextNode = (node: Node, escapedDelimiters: Set<number>, delimiterCo
 
 	// Replace the original text node with the new fragment
 	node.parentNode.replaceChild(fragment, node);
-}
+};
 
-export const updateReadingMode = (element: HTMLElement, plugin: Plugin, ctx?: MarkdownPostProcessorContext) => {
+export const updateReadingMode = (
+	element: HTMLElement,
+	plugin: Plugin,
+	ctx?: MarkdownPostProcessorContext,
+) => {
 	// Compute which ordinal || delimiters are escaped in the raw markdown source.
 	// getSectionInfo returns the full document text along with lineStart/lineEnd
 	// for the section, so we extract just the relevant lines.
@@ -210,8 +301,10 @@ export const updateReadingMode = (element: HTMLElement, plugin: Plugin, ctx?: Ma
 	if (ctx) {
 		const sectionInfo = ctx.getSectionInfo(element);
 		if (sectionInfo) {
-			const lines = sectionInfo.text.split("\n");
-			const sectionText = lines.slice(sectionInfo.lineStart, sectionInfo.lineEnd + 1).join("\n");
+			const lines = sectionInfo.text.split('\n');
+			const sectionText = lines
+				.slice(sectionInfo.lineStart, sectionInfo.lineEnd + 1)
+				.join('\n');
 			escapedDelimiters = findEscapedDelimiters(sectionText);
 		}
 	}
@@ -222,21 +315,30 @@ export const updateReadingMode = (element: HTMLElement, plugin: Plugin, ctx?: Ma
 
 	for (const elem of allowedElems) {
 		// Process each child node of the element
-		processElement(elem, escapedDelimiters, delimiterCounter, processedElements);
+		processElement(
+			elem,
+			escapedDelimiters,
+			delimiterCounter,
+			processedElements,
+		);
 	}
 
-	const spoilers = element.findAll(".inline_spoilers-spoiler");
+	const spoilers = element.findAll('.inline_spoilers-spoiler');
 
 	for (const spoiler of spoilers) {
 		plugin.registerDomEvent(spoiler, 'click', () => {
-			spoiler.classList.toggle("inline_spoilers-revealed");
+			spoiler.classList.toggle('inline_spoilers-revealed');
 		});
 	}
-}
+};
 
 export const unloadReadingMode = (workspace: Workspace) => {
 	// remove all spoilers from reader mode
-	const spoilers = Array.from(workspace.containerEl.querySelectorAll<HTMLElement>(".inline_spoilers-spoiler"));
+	const spoilers = Array.from(
+		workspace.containerEl.querySelectorAll<HTMLElement>(
+			'.inline_spoilers-spoiler',
+		),
+	);
 
 	for (const spoiler of spoilers) {
 		const parent = spoiler.parentNode;
@@ -244,12 +346,11 @@ export const unloadReadingMode = (workspace: Workspace) => {
 
 		// Re-wrap the spoiler content with || delimiters, preserving child nodes
 		const fragment = createFragment();
-		fragment.appendChild(document.createTextNode("||"));
+		fragment.appendChild(document.createTextNode('||'));
 		while (spoiler.firstChild) {
 			fragment.appendChild(spoiler.firstChild);
 		}
-		fragment.appendChild(document.createTextNode("||"));
+		fragment.appendChild(document.createTextNode('||'));
 		parent.replaceChild(fragment, spoiler);
 	}
-}
-
+};

@@ -1,7 +1,17 @@
-import { PluginSettingTab, type App, type SettingDefinitionItem } from 'obsidian';
+import {
+	PluginSettingTab,
+	type App,
+	type SettingDefinitionItem,
+} from 'obsidian';
 import type InlineSpoilerPlugin from '../main';
 import { configureEditorMode } from './editor-mode';
-import { InlineSpoilerPluginSettings, isValidSpoilerColor, isValidSpoilerStyle, SPOILER_COLOURS, SPOILER_STYLES } from './settings';
+import {
+	InlineSpoilerPluginSettings,
+	isValidSpoilerColor,
+	isValidSpoilerStyle,
+	SPOILER_COLOURS,
+	SPOILER_STYLES,
+} from './settings';
 
 export class InlineSpoilerPluginSettingsTab extends PluginSettingTab {
 	plugin: InlineSpoilerPlugin;
@@ -11,7 +21,9 @@ export class InlineSpoilerPluginSettingsTab extends PluginSettingTab {
 		this.plugin = plugin;
 	}
 
-	getSettingDefinitions(): SettingDefinitionItem<keyof InlineSpoilerPluginSettings>[] {
+	getSettingDefinitions(): SettingDefinitionItem<
+		keyof InlineSpoilerPluginSettings
+	>[] {
 		return [
 			{
 				name: 'Reveal all spoilers',
@@ -38,7 +50,8 @@ export class InlineSpoilerPluginSettingsTab extends PluginSettingTab {
 					type: 'dropdown',
 					key: 'spoilerColor',
 					options: SPOILER_COLOURS,
-					defaultValue: 'accent' satisfies keyof typeof SPOILER_COLOURS,
+					defaultValue:
+						'accent' satisfies keyof typeof SPOILER_COLOURS,
 				},
 			},
 			{
@@ -59,7 +72,10 @@ export class InlineSpoilerPluginSettingsTab extends PluginSettingTab {
 			case 'showAllSpoilers':
 				if (typeof value !== 'boolean') return;
 				this.plugin.settings.showAllSpoilers = value;
-				this.app.workspace.containerEl.toggleClass('inline_spoilers-revealed', value);
+				this.app.workspace.containerEl.toggleClass(
+					'inline_spoilers-revealed',
+					value,
+				);
 				break;
 			case 'enableEditorMode':
 				if (typeof value !== 'boolean') return;

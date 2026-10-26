@@ -1,6 +1,14 @@
 import { syntaxTree } from '@codemirror/language';
 import { RangeSetBuilder, type Extension } from '@codemirror/state';
-import { Decoration, ViewPlugin, type DecorationSet, type EditorView, type PluginSpec, type PluginValue, type ViewUpdate } from '@codemirror/view';
+import {
+	Decoration,
+	ViewPlugin,
+	type DecorationSet,
+	type EditorView,
+	type PluginSpec,
+	type PluginValue,
+	type ViewUpdate,
+} from '@codemirror/view';
 import type { Workspace } from 'obsidian';
 
 /*
@@ -10,14 +18,14 @@ const SPOILER_REGEX = /\|\|(.+?)\|\|/g;
 
 /** The spoiler content between the `||` delimiters */
 const spoilerDecoration = Decoration.mark({
-	class: "inline_spoilers-editor-spoiler",
-	tagName: "span",
+	class: 'inline_spoilers-editor-spoiler',
+	tagName: 'span',
 });
 
 /** The `||` delimiters */
 const spoilerDelimiterDecoration = Decoration.mark({
-	class: "inline_spoilers-editor-spoiler-delimiter",
-	tagName: "span",
+	class: 'inline_spoilers-editor-spoiler-delimiter',
+	tagName: 'span',
 });
 
 class SpoilerEditorPlugin implements PluginValue {
@@ -33,11 +41,11 @@ class SpoilerEditorPlugin implements PluginValue {
 		}
 	}
 
-	destroy() { }
+	destroy() {}
 
 	buildDecorations(view: EditorView): DecorationSet {
 		const builder = new RangeSetBuilder<Decoration>();
-		const ranges: { from: number, to: number, isDelimiter: boolean }[] = [];
+		const ranges: { from: number; to: number; isDelimiter: boolean }[] = [];
 
 		for (const { from, to } of view.visibleRanges) {
 			syntaxTree(view.state).iterate({
@@ -53,13 +61,25 @@ class SpoilerEditorPlugin implements PluginValue {
 
 						const text = view.state.sliceDoc(start, end);
 
-						if (!text.startsWith("||") && !text.endsWith("||")) {
-							continue;  // sanity check
+						if (!text.startsWith('||') && !text.endsWith('||')) {
+							continue; // sanity check
 						}
 
-						ranges.push({ from: start, to: start + 2, isDelimiter: true });
-						ranges.push({ from: start + 2, to: end - 2, isDelimiter: false });
-						ranges.push({ from: end - 2, to: end, isDelimiter: true });
+						ranges.push({
+							from: start,
+							to: start + 2,
+							isDelimiter: true,
+						});
+						ranges.push({
+							from: start + 2,
+							to: end - 2,
+							isDelimiter: false,
+						});
+						ranges.push({
+							from: end - 2,
+							to: end,
+							isDelimiter: true,
+						});
 					}
 				},
 			});
@@ -70,7 +90,13 @@ class SpoilerEditorPlugin implements PluginValue {
 
 		// Add sorted ranges to the builder
 		for (const range of ranges) {
-			builder.add(range.from, range.to, range.isDelimiter ? spoilerDelimiterDecoration : spoilerDecoration);
+			builder.add(
+				range.from,
+				range.to,
+				range.isDelimiter
+					? spoilerDelimiterDecoration
+					: spoilerDecoration,
+			);
 		}
 
 		return builder.finish();
@@ -83,12 +109,15 @@ const pluginSpec: PluginSpec<SpoilerEditorPlugin> = {
 
 const spoilerEditorPlugin = ViewPlugin.fromClass(
 	SpoilerEditorPlugin,
-	pluginSpec
+	pluginSpec,
 );
 
 export const editorPlugins: Extension[] = [];
 
-export const configureEditorMode = (enabled: boolean, workspace?: Workspace) => {
+export const configureEditorMode = (
+	enabled: boolean,
+	workspace?: Workspace,
+) => {
 	const index = editorPlugins.indexOf(spoilerEditorPlugin);
 	if (enabled && index === -1) {
 		editorPlugins.push(spoilerEditorPlugin);
@@ -98,4 +127,3 @@ export const configureEditorMode = (enabled: boolean, workspace?: Workspace) => 
 
 	workspace?.updateOptions();
 };
-

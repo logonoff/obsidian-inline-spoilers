@@ -25,7 +25,7 @@ sure they are outside the spoiler:
 ```md
 **||This text will be hidden and bolded||**
 
-*||This text will be hidden and italicized||*
+_||This text will be hidden and italicized||_
 ```
 
 To reveal or hide a spoiler, click on it. You may opt to always show all spoilers

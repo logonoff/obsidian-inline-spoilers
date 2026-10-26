@@ -21,7 +21,8 @@ export const findEscapedDelimiters = (rawMarkdown: string): Set<number> => {
 	let i = 0;
 	while (i < rawMarkdown.length - 1) {
 		// Check for a `||` at this position (where each pipe may or may not be escaped)
-		const firstIsEscapedPipe = rawMarkdown[i] === '\\' && rawMarkdown[i + 1] === '|';
+		const firstIsEscapedPipe =
+			rawMarkdown[i] === '\\' && rawMarkdown[i + 1] === '|';
 		const firstIsPipe = rawMarkdown[i] === '|';
 
 		if (!firstIsEscapedPipe && !firstIsPipe) {
@@ -44,7 +45,10 @@ export const findEscapedDelimiters = (rawMarkdown: string): Set<number> => {
 			continue;
 		}
 
-		const secondIsEscapedPipe = rawMarkdown[nextPos] === '\\' && nextPos + 1 < rawMarkdown.length && rawMarkdown[nextPos + 1] === '|';
+		const secondIsEscapedPipe =
+			rawMarkdown[nextPos] === '\\' &&
+			nextPos + 1 < rawMarkdown.length &&
+			rawMarkdown[nextPos + 1] === '|';
 		const secondIsPipe = rawMarkdown[nextPos] === '|';
 
 		if (!secondIsEscapedPipe && !secondIsPipe) {
@@ -65,16 +69,20 @@ export const findEscapedDelimiters = (rawMarkdown: string): Set<number> => {
 	}
 
 	return escaped;
-}
+};
 
 /**
  * Finds all `||` delimiter positions in the given text and returns their
  * character indices along with whether each is escaped (by ordinal lookup).
  * Each spoiler `||content||` uses two delimiters: an opening and a closing.
  */
-export const findDelimiterPairs = (text: string, escapedDelimiters: Set<number>, delimiterCounter: { value: number }): { start: number, end: number }[] => {
+export const findDelimiterPairs = (
+	text: string,
+	escapedDelimiters: Set<number>,
+	delimiterCounter: { value: number },
+): { start: number; end: number }[] => {
 	SPOILER_REGEX.lastIndex = 0;
-	const matches: { start: number, end: number }[] = [];
+	const matches: { start: number; end: number }[] = [];
 	let match: RegExpExecArray | null;
 
 	while ((match = SPOILER_REGEX.exec(text)) !== null) {
@@ -83,12 +91,18 @@ export const findDelimiterPairs = (text: string, escapedDelimiters: Set<number>,
 		delimiterCounter.value += 2;
 
 		// Skip if either the opening or closing delimiter is escaped
-		if (escapedDelimiters.has(openOrdinal) || escapedDelimiters.has(closeOrdinal)) {
+		if (
+			escapedDelimiters.has(openOrdinal) ||
+			escapedDelimiters.has(closeOrdinal)
+		) {
 			continue;
 		}
 
-		matches.push({ start: match.index, end: match.index + match[0].length });
+		matches.push({
+			start: match.index,
+			end: match.index + match[0].length,
+		});
 	}
 
 	return matches;
-}
+};

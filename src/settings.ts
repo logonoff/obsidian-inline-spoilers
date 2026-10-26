@@ -13,11 +13,15 @@ export const SPOILER_COLOURS = {
 	accent: 'Follow accent color',
 } as const;
 
-export const isValidSpoilerStyle = (value: unknown): value is keyof typeof SPOILER_STYLES => {
+export const isValidSpoilerStyle = (
+	value: unknown,
+): value is keyof typeof SPOILER_STYLES => {
 	return typeof value === 'string' && value in SPOILER_STYLES;
 };
 
-export const isValidSpoilerColor = (value: unknown): value is keyof typeof SPOILER_COLOURS => {
+export const isValidSpoilerColor = (
+	value: unknown,
+): value is keyof typeof SPOILER_COLOURS => {
 	return typeof value === 'string' && value in SPOILER_COLOURS;
 };
 

@@ -1,28 +1,28 @@
 name: Lint Obsidian plugin
 
 on:
-  push:
-    branches: ["**"]
-  pull_request:
-    branches: ["**"]
+    push:
+        branches: ['**']
+    pull_request:
+        branches: ['**']
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+    build:
+        runs-on: ubuntu-latest
 
-    steps:
-      - uses: actions/checkout@v6
+        steps:
+            - uses: actions/checkout@v6
 
-      - name: Use Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: "22.x" # Taken from `process.version.node`` in Obsidian 1.10.6
-          cache: "npm"
+            - name: Use Node.js
+              uses: actions/setup-node@v6
+              with:
+                  node-version: '22.x' # Taken from `process.version.node`` in Obsidian 1.10.6
+                  cache: 'npm'
 
-      - name: Build plugin
-        run: |
-          npm clean-install --ignore-scripts
-          npm run build
+            - name: Build plugin
+              run: |
+                  npm clean-install --ignore-scripts
+                  npm run build
 
-      - name: Lint code
-        run: npm run lint
+            - name: Lint code
+              run: npm run lint && npx prettier --check .

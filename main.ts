@@ -1,8 +1,18 @@
 import { Plugin, type Editor } from 'obsidian';
-import { applyAppearance as applyDocumentAppearance, removeAppearance } from './src/appearance';
+import {
+	applyAppearance as applyDocumentAppearance,
+	removeAppearance,
+} from './src/appearance';
 import { configureEditorMode, editorPlugins } from './src/editor-mode';
-import { rerenderExistingReadingView, updateReadingMode, unloadReadingMode } from './src/reading-mode';
-import { DEFAULT_SETTINGS, type InlineSpoilerPluginSettings } from './src/settings';
+import {
+	rerenderExistingReadingView,
+	updateReadingMode,
+	unloadReadingMode,
+} from './src/reading-mode';
+import {
+	DEFAULT_SETTINGS,
+	type InlineSpoilerPluginSettings,
+} from './src/settings';
 import { InlineSpoilerPluginSettingsTab } from './src/settings-tab';
 
 /*
@@ -16,7 +26,7 @@ export default class InlineSpoilerPlugin extends Plugin {
 
 	async onload() {
 		this.documents.add(this.app.workspace.containerEl.doc);
-		this.app.workspace.iterateAllLeaves(leaf => {
+		this.app.workspace.iterateAllLeaves((leaf) => {
 			this.documents.add(leaf.view.containerEl.doc);
 		});
 
@@ -41,28 +51,41 @@ export default class InlineSpoilerPlugin extends Plugin {
 		this.registerEditorExtension(editorPlugins);
 
 		// popout windows have their own document, which needs the appearance applied as well
-		this.registerEvent(this.app.workspace.on('window-open', (_win, window) => {
-			this.documents.add(window.document);
-			applyDocumentAppearance(window.document, this.settings);
-		}));
-		this.registerEvent(this.app.workspace.on('window-close', (_win, window) => {
-			this.documents.delete(window.document);
-		}));
+		this.registerEvent(
+			this.app.workspace.on('window-open', (_win, window) => {
+				this.documents.add(window.document);
+				applyDocumentAppearance(window.document, this.settings);
+			}),
+		);
+		this.registerEvent(
+			this.app.workspace.on('window-close', (_win, window) => {
+				this.documents.delete(window.document);
+			}),
+		);
 
 		// This adds a settings tab so the user can configure various aspects of the plugin
 		this.addSettingTab(new InlineSpoilerPluginSettingsTab(this.app, this));
 	}
 
 	onunload() {
-		this.app.workspace.containerEl.classList.remove('inline_spoilers-revealed');
+		this.app.workspace.containerEl.classList.remove(
+			'inline_spoilers-revealed',
+		);
 		unloadReadingMode(this.app.workspace);
 		configureEditorMode(false, this.app.workspace);
 		this.documents.forEach(removeAppearance);
 	}
 
 	async loadSettings() {
-		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData() as Partial<InlineSpoilerPluginSettings>);
-		this.app.workspace.containerEl.toggleClass('inline_spoilers-revealed', this.settings.showAllSpoilers);
+		this.settings = Object.assign(
+			{},
+			DEFAULT_SETTINGS,
+			(await this.loadData()) as Partial<InlineSpoilerPluginSettings>,
+		);
+		this.app.workspace.containerEl.toggleClass(
+			'inline_spoilers-revealed',
+			this.settings.showAllSpoilers,
+		);
 		configureEditorMode(this.settings.enableEditorMode);
 		this.applyAppearance();
 	}
@@ -73,6 +96,8 @@ export default class InlineSpoilerPlugin extends Plugin {
 	}
 
 	applyAppearance() {
-		this.documents.forEach(doc => applyDocumentAppearance(doc, this.settings));
+		this.documents.forEach((doc) =>
+			applyDocumentAppearance(doc, this.settings),
+		);
 	}
 }
