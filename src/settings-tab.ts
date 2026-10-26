@@ -1,7 +1,7 @@
 import { PluginSettingTab, type App, type SettingDefinitionItem } from 'obsidian';
 import type InlineSpoilerPlugin from '../main';
 import { configureEditorMode } from './editor-mode';
-import { SPOILER_STYLES } from './settings';
+import { InlineSpoilerPluginSettings, isValidSpoilerColor, isValidSpoilerStyle, SPOILER_COLOURS, SPOILER_STYLES } from './settings';
 
 export class InlineSpoilerPluginSettingsTab extends PluginSettingTab {
 	plugin: InlineSpoilerPlugin;
@@ -11,7 +11,7 @@ export class InlineSpoilerPluginSettingsTab extends PluginSettingTab {
 		this.plugin = plugin;
 	}
 
-	getSettingDefinitions(): SettingDefinitionItem[] {
+	getSettingDefinitions(): SettingDefinitionItem<keyof InlineSpoilerPluginSettings>[] {
 		return [
 			{
 				name: 'Reveal all spoilers',
@@ -23,12 +23,22 @@ export class InlineSpoilerPluginSettingsTab extends PluginSettingTab {
 				},
 			},
 			{
-				name: 'Hide spoilers in editor view (experimental)',
+				name: 'Hide spoilers in editor view (beta)',
 				desc: 'Hide spoilers in the editor until your cursor is on the same line as the spoiler.',
 				control: {
 					type: 'toggle',
 					key: 'enableEditorMode',
 					defaultValue: false,
+				},
+			},
+			{
+				name: 'Spoiler color',
+				desc: 'The color of hidden spoilers.',
+				control: {
+					type: 'dropdown',
+					key: 'spoilerColor',
+					options: SPOILER_COLOURS,
+					defaultValue: 'accent' satisfies keyof typeof SPOILER_COLOURS,
 				},
 			},
 			{
@@ -38,7 +48,7 @@ export class InlineSpoilerPluginSettingsTab extends PluginSettingTab {
 					type: 'dropdown',
 					key: 'spoilerStyle',
 					options: SPOILER_STYLES,
-					defaultValue: 'accent',
+					defaultValue: 'solid' satisfies keyof typeof SPOILER_STYLES,
 				},
 			},
 		];
@@ -57,8 +67,12 @@ export class InlineSpoilerPluginSettingsTab extends PluginSettingTab {
 				configureEditorMode(value, this.app.workspace);
 				break;
 			case 'spoilerStyle':
-				if (value !== 'accent' && value !== 'blur') return;
+				if (!isValidSpoilerStyle(value)) return;
 				this.plugin.settings.spoilerStyle = value;
+				break;
+			case 'spoilerColor':
+				if (!isValidSpoilerColor(value)) return;
+				this.plugin.settings.spoilerColor = value;
 				break;
 			default:
 				return;

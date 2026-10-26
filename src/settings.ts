@@ -3,20 +3,34 @@
  */
 /** How hidden spoilers are obscured */
 export const SPOILER_STYLES = {
-	accent: 'Follow accent color',
+	solid: 'Solid',
 	blur: 'Blur',
 } as const;
 
-export type SpoilerStyle = keyof typeof SPOILER_STYLES;
+/** The colour of hidden spoilers */
+export const SPOILER_COLOURS = {
+	code: 'Follow code block color',
+	accent: 'Follow accent color',
+} as const;
+
+export const isValidSpoilerStyle = (value: unknown): value is keyof typeof SPOILER_STYLES => {
+	return typeof value === 'string' && value in SPOILER_STYLES;
+};
+
+export const isValidSpoilerColor = (value: unknown): value is keyof typeof SPOILER_COLOURS => {
+	return typeof value === 'string' && value in SPOILER_COLOURS;
+};
 
 export interface InlineSpoilerPluginSettings {
 	showAllSpoilers: boolean;
 	enableEditorMode: boolean;
-	spoilerStyle: SpoilerStyle;
+	spoilerStyle: keyof typeof SPOILER_STYLES;
+	spoilerColor: keyof typeof SPOILER_COLOURS;
 }
 
 export const DEFAULT_SETTINGS: InlineSpoilerPluginSettings = {
 	showAllSpoilers: false,
 	enableEditorMode: false,
-	spoilerStyle: 'accent',
+	spoilerStyle: 'solid',
+	spoilerColor: 'code',
 };

@@ -5,12 +5,22 @@
  */
 body {
 	--inline-spoilers-hidden-foreground: transparent;
-	--inline-spoilers-hidden-background: var(--interactive-accent);
+	--inline-spoilers-spoiler-radius: var(--radius-s);
+}
 
+/**
+ * spoiler colour themes
+ */
+.inline_spoilers-colour-accent {
+	--inline-spoilers-hidden-background: var(--interactive-accent);
 	--inline-spoilers-revealed-foreground: var(--text-accent);
 	--inline-spoilers-revealed-background: hsla(var(--color-accent-hsl), 0.075);
+}
 
-	--inline-spoilers-spoiler-radius: var(--radius-s);
+.inline_spoilers-colour-code {
+	--inline-spoilers-hidden-background: var(--code-background);
+	--inline-spoilers-revealed-foreground: var(--code-normal);
+	--inline-spoilers-revealed-background: var(--code-background);
 }
 
 /**
@@ -35,7 +45,7 @@ body {
 }
 
 /**
- * blurred spoilers keep their text visible, but run it through a filter
+ * blur style
  */
 .inline_spoilers-style-blur {
 	& .inline_spoilers-spoiler,
