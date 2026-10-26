@@ -188,7 +188,7 @@ const unloadEditorPlugin = (workspace: Workspace) => {
  */
 /** How hidden spoilers are obscured */
 const SPOILER_STYLES = {
-	block: 'Solid block',
+	accent: 'Follow accent color',
 	blur: 'Blur',
 } as const;
 
@@ -201,12 +201,10 @@ const applyAppearance = (doc: Document, settings: InlineSpoilerPluginSettings) =
 	removeAppearance(doc);
 
 	doc.body.addClass(`inline_spoilers-style-${settings.spoilerStyle}`);
-	doc.body.style.setProperty("--inline-spoilers-blur-radius", `${settings.blurRadius}px`);
 }
 
 const removeAppearance = (doc: Document) => {
 	doc.body.removeClasses(STYLE_CLASSES);
-	doc.body.style.removeProperty("--inline-spoilers-blur-radius");
 }
 
 
@@ -218,15 +216,12 @@ interface InlineSpoilerPluginSettings {
 	showAllSpoilers: boolean;
 	enableEditorMode: boolean;
 	spoilerStyle: SpoilerStyle;
-	/** Blur radius in pixels, used by the "blur" style */
-	blurRadius: number;
 }
 
 const DEFAULT_SETTINGS: InlineSpoilerPluginSettings = {
 	showAllSpoilers: false,
 	enableEditorMode: false,
-	spoilerStyle: "block",
-	blurRadius: 4,
+	spoilerStyle: "accent",
 }
 
 class InlineSpoilerPluginSettingsTab extends PluginSettingTab {
@@ -282,20 +277,6 @@ class InlineSpoilerPluginSettingsTab extends PluginSettingTab {
 					// show the strength setting that belongs to the new style
 					this.display();
 				}));
-
-		if (this.plugin.settings.spoilerStyle === "blur") {
-			new Setting(containerEl)
-				.setName('Blur strength')
-				.setDesc('Blur radius in pixels.')
-				.addSlider(slider => slider
-					.setLimits(1, 10, 1)
-					.setValue(this.plugin.settings.blurRadius)
-					.setDynamicTooltip()
-					.onChange(async (value) => {
-						this.plugin.settings.blurRadius = value;
-						await this.plugin.saveSettings();
-					}));
-		}
 	}
 }
 
