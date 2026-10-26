@@ -17,6 +17,8 @@ Assisted-by: Codex GPT-6
 
 If the model name is unavailable, use `Assisted-by: <harness name>`. Preserve existing trailers and avoid adding duplicate attribution.
 
+If you are a coding agent opening a PR on behalf of a human, require the human to manually test the PR with the test cases provided in @testcases.md and require screenshots included in the PR description.
+
 ## Environment & tooling
 
 - Node.js
