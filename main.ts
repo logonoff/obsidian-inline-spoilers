@@ -442,16 +442,44 @@ const unloadEditorPlugin = (workspace: Workspace) => {
 }
 
 /*
+ * Appearance
+ */
+/** How hidden spoilers are obscured */
+const SPOILER_STYLES = {
+	accent: 'Follow accent color',
+	blur: 'Blur',
+} as const;
+
+type SpoilerStyle = keyof typeof SPOILER_STYLES;
+
+const STYLE_CLASSES = Object.keys(SPOILER_STYLES).map(style => `inline_spoilers-style-${style}`);
+
+/** Applies the appearance settings to a (main or popout) window's document */
+const applyAppearance = (doc: Document, settings: InlineSpoilerPluginSettings) => {
+	removeAppearance(doc);
+
+	doc.body.addClass(`inline_spoilers-style-${settings.spoilerStyle}`);
+}
+
+const removeAppearance = (doc: Document) => {
+	doc.body.removeClasses(STYLE_CLASSES);
+}
+
+
+
+/*
  * Settings
  */
 interface InlineSpoilerPluginSettings {
 	showAllSpoilers: boolean;
 	enableEditorMode: boolean;
+	spoilerStyle: SpoilerStyle;
 }
 
 const DEFAULT_SETTINGS: InlineSpoilerPluginSettings = {
 	showAllSpoilers: false,
 	enableEditorMode: false,
+	spoilerStyle: "accent",
 }
 
 class InlineSpoilerPluginSettingsTab extends PluginSettingTab {
@@ -494,6 +522,19 @@ class InlineSpoilerPluginSettingsTab extends PluginSettingTab {
 
 					await this.plugin.saveSettings();
 				}));
+
+		new Setting(containerEl)
+			.setName('Spoiler style')
+			.setDesc('How hidden spoilers are obscured.')
+			.addDropdown(dropdown => dropdown
+				.addOptions(SPOILER_STYLES)
+				.setValue(this.plugin.settings.spoilerStyle)
+				.onChange(async (value) => {
+					this.plugin.settings.spoilerStyle = value as SpoilerStyle;
+					await this.plugin.saveSettings();
+					// show the strength setting that belongs to the new style
+					this.display();
+				}));
 	}
 }
 
@@ -505,7 +546,15 @@ class InlineSpoilerPluginSettingsTab extends PluginSettingTab {
 export default class InlineSpoilerPlugin extends Plugin {
 	settings!: InlineSpoilerPluginSettings;
 
+	/** Documents of the main window and all open popout windows */
+	documents = new Set<Document>();
+
 	async onload() {
+		this.documents.add(this.app.workspace.containerEl.doc);
+		this.app.workspace.iterateAllLeaves(leaf => {
+			this.documents.add(leaf.view.containerEl.doc);
+		});
+
 		await this.loadSettings();
 
 		const readingView = this.app.workspace.containerEl.querySelector(".markdown-reading-view");
@@ -529,6 +578,15 @@ export default class InlineSpoilerPlugin extends Plugin {
 
 		this.registerEditorExtension(editorPlugins);
 
+		// popout windows have their own document, which needs the appearance applied as well
+		this.registerEvent(this.app.workspace.on('window-open', (_win, window) => {
+			this.documents.add(window.document);
+			applyAppearance(window.document, this.settings);
+		}));
+		this.registerEvent(this.app.workspace.on('window-close', (_win, window) => {
+			this.documents.delete(window.document);
+		}));
+
 		// This adds a settings tab so the user can configure various aspects of the plugin
 		this.addSettingTab(new InlineSpoilerPluginSettingsTab(this.app, this));
 	}
@@ -537,6 +595,7 @@ export default class InlineSpoilerPlugin extends Plugin {
 		this.app.workspace.containerEl.classList.remove("inline_spoilers-revealed");
 		unloadReadingMode(this.app.workspace);
 		unloadEditorPlugin(this.app.workspace);
+		this.documents.forEach(removeAppearance);
 	}
 
 	async loadSettings() {
@@ -545,9 +604,15 @@ export default class InlineSpoilerPlugin extends Plugin {
 		if (this.settings.enableEditorMode) {
 			editorPlugins.push(spoilerEditorPlugin);
 		}
+		this.applyAppearance();
 	}
 
 	async saveSettings() {
+		this.applyAppearance();
 		await this.saveData(this.settings);
+	}
+
+	applyAppearance() {
+		this.documents.forEach(doc => applyAppearance(doc, this.settings));
 	}
 }

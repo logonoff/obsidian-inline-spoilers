@@ -35,6 +35,22 @@ body {
 }
 
 /**
+ * blurred spoilers keep their text visible, but run it through a filter
+ */
+.inline_spoilers-style-blur {
+	& .inline_spoilers-spoiler,
+	& .inline_spoilers-editor-spoiler,
+	& .inline_spoilers-editor-spoiler-delimiter
+	{
+		background-color: var(--inline-spoilers-revealed-background);
+		color: var(--inline-spoilers-revealed-foreground);
+		filter: var(--inline-spoilers-blur-filter, var(--blur-s));
+		opacity: var(--inline-spoilers-blur-opacity, var(--blur-opacity-s));
+		transition: filter var(--anim-duration-fast) var(--anim-motion-smooth);
+	}
+}
+
+/**
  * revealed spoilers
  */
 /** used when a hidden spoiler is revealed by clicking in reader mode */
@@ -50,6 +66,7 @@ body {
 .inline_spoilers-revealed .inline_spoilers-editor-spoiler-delimiter {
 	background-color: var(--inline-spoilers-revealed-background) !important;
 	color: var(--inline-spoilers-revealed-foreground) !important;
+	filter: none;
 }
 
 /** ensure descendants are also revealed when the spoiler is revealed */
