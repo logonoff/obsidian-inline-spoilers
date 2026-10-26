@@ -3,7 +3,7 @@ import {
 	type App,
 	type SettingDefinitionItem,
 } from 'obsidian';
-import type InlineSpoilerPlugin from '../main';
+import type InlineSpoilerPlugin from './main';
 import { configureEditorMode } from './editor-mode';
 import {
 	InlineSpoilerPluginSettings,

@@ -12,5 +12,5 @@
 		"strict": true,
 		"lib": ["es2021", "DOM"]
 	},
-	"include": ["**/*.ts"]
+	"include": ["src/**/*.ts"]
 }

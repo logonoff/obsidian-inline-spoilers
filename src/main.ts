@@ -2,18 +2,15 @@ import { Plugin, type Editor } from 'obsidian';
 import {
 	applyAppearance as applyDocumentAppearance,
 	removeAppearance,
-} from './src/appearance';
-import { configureEditorMode, editorPlugins } from './src/editor-mode';
+} from './appearance';
+import { configureEditorMode, editorPlugins } from './editor-mode';
 import {
 	rerenderExistingReadingView,
 	updateReadingMode,
 	unloadReadingMode,
-} from './src/reading-mode';
-import {
-	DEFAULT_SETTINGS,
-	type InlineSpoilerPluginSettings,
-} from './src/settings';
-import { InlineSpoilerPluginSettingsTab } from './src/settings-tab';
+} from './reading-mode';
+import { DEFAULT_SETTINGS, type InlineSpoilerPluginSettings } from './settings';
+import { InlineSpoilerPluginSettingsTab } from './settings-tab';
 
 /*
  * Obsidian plugin interface

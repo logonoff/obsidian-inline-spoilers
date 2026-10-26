@@ -8,10 +8,6 @@ export default defineConfig(
 	...ts.configs.recommended,
 	...obsidian.configs.recommended,
 	{
-		rules: {
-			// https://typescript-eslint.io/troubleshooting/faqs/eslint
-			'no-undef': 'off',
-		},
 		languageOptions: {
 			parserOptions: {
 				projectService: {
