@@ -6,6 +6,7 @@
     "target": "es2021",
     "allowJs": false,
     "noImplicitAny": true,
+    "moduleResolution": "bundler",
     "importHelpers": true,
     "isolatedModules": true,
     "strict": true,
