@@ -61,6 +61,18 @@ const processElement = (
 	if (processedElements.has(element)) return;
 	processedElements.add(element);
 
+	const htmlElement = element as HTMLElement;
+	if (htmlElement.matches('code, pre')) {
+		// Keep delimiter ordinals in step with the source scan, but never render
+		// spoilers from code content.
+		findDelimiterPairs(
+			element.textContent ?? '',
+			escapedDelimiters,
+			delimiterCounter,
+		);
+		return;
+	}
+
 	// Don't process nodes that are already spoiler spans
 	if (
 		element.instanceOf(HTMLElement) &&
@@ -70,6 +82,24 @@ const processElement = (
 
 	const fullText = element.textContent ?? '';
 	if (!fullText.includes('||')) return;
+
+	// Parent textContent includes inline code. Process its children separately
+	// so spoiler delimiters cannot match through code content.
+	if (htmlElement.querySelector('code, pre')) {
+		for (const child of Array.from(element.childNodes)) {
+			if (child.nodeType === Node.TEXT_NODE) {
+				processTextNode(child, escapedDelimiters, delimiterCounter);
+			} else if (child.nodeType === Node.ELEMENT_NODE) {
+				processElement(
+					child,
+					escapedDelimiters,
+					delimiterCounter,
+					processedElements,
+				);
+			}
+		}
+		return;
+	}
 
 	// Save counter state so we can replay it for the actual processing
 	const savedCounter = delimiterCounter.value;

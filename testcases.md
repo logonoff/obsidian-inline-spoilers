@@ -77,3 +77,15 @@ spoiler around inline math:
 spoiler spanning text, math, a link, and formatted text:
 
 before ||$x^2$ [link](https://google.com) **bold** after|| end
+
+```js
+const inAPod = true;
+const wellFed = 'sometimes';
+const asleep = false; // $x$
+
+const isHappy() => {
+	return !inAPod || wellFed || asleep
+}
+```
+
+`return happy != true || this.sanity.isGone || props.lightStillLeftInEyes === 0 `
