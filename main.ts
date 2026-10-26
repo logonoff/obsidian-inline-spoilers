@@ -1,7 +1,7 @@
 import { Plugin, type Editor } from 'obsidian';
 import { applyAppearance as applyDocumentAppearance, removeAppearance } from './src/appearance';
 import { configureEditorMode, editorPlugins } from './src/editor-mode';
-import { updateReadingMode, unloadReadingMode } from './src/reading-mode';
+import { rerenderExistingReadingView, updateReadingMode, unloadReadingMode } from './src/reading-mode';
 import { DEFAULT_SETTINGS, type InlineSpoilerPluginSettings } from './src/settings';
 import { InlineSpoilerPluginSettingsTab } from './src/settings-tab';
 
@@ -22,14 +22,11 @@ export default class InlineSpoilerPlugin extends Plugin {
 
 		await this.loadSettings();
 
-		const readingView = this.app.workspace.containerEl.querySelector('.markdown-reading-view');
-		if (readingView) {
-			updateReadingMode(readingView as HTMLElement, this);
-		}
-
 		this.registerMarkdownPostProcessor((element, ctx) => {
 			updateReadingMode(element, this, ctx);
 		});
+
+		rerenderExistingReadingView(this.app.workspace);
 
 		// This adds an editor command that can perform some operation on the current editor instance
 		this.addCommand({

@@ -1,4 +1,4 @@
-import type { MarkdownPostProcessorContext, Plugin, Workspace } from 'obsidian';
+import { MarkdownView, type MarkdownPostProcessorContext, type Plugin, type Workspace } from 'obsidian';
 import { findDelimiterPairs, findEscapedDelimiters } from './spoiler-syntax';
 
 /** Allowed HTML tags to process for spoilers */
@@ -24,8 +24,22 @@ const findChildAtOffset = (parent: Node, offset: number): { node: Node, localOff
 	return null;
 }
 
-const processElement = (element: Node, escapedDelimiters: Set<number>, delimiterCounter: { value: number }) => {
+export const rerenderExistingReadingView = (workspace: Workspace) => {
+	const readingView = workspace.containerEl.querySelector('.markdown-reading-view');
+	if (!readingView) return;
+
+	workspace.iterateAllLeaves(leaf => {
+		const view = leaf.view;
+		if (view instanceof MarkdownView && view.getMode() === 'preview' && view.containerEl.contains(readingView)) {
+			view.previewMode.rerender(true);
+		}
+	});
+};
+
+const processElement = (element: Node, escapedDelimiters: Set<number>, delimiterCounter: { value: number }, processedElements: WeakSet<Node>) => {
 	if (element.nodeType !== Node.ELEMENT_NODE) return;
+	if (processedElements.has(element)) return;
+	processedElements.add(element);
 
 	// Don't process nodes that are already spoiler spans
 	if (element instanceof HTMLElement && element.classList.contains("inline_spoilers-spoiler")) return;
@@ -38,15 +52,18 @@ const processElement = (element: Node, escapedDelimiters: Set<number>, delimiter
 
 	// Find all valid (non-escaped) spoiler matches
 	const validMatches = findDelimiterPairs(fullText, escapedDelimiters, delimiterCounter);
+	const scannedCounter = delimiterCounter.value;
 
 	if (validMatches.length === 0) {
 		// No spoilers at this level, recurse into child elements
 		// Reset counter since findDelimiterPairs already advanced it
+		delimiterCounter.value = savedCounter;
 		for (const child of Array.from(element.childNodes)) {
 			if (child.nodeType === Node.ELEMENT_NODE) {
-				processElement(child, escapedDelimiters, delimiterCounter);
+				processElement(child, escapedDelimiters, delimiterCounter, processedElements);
 			}
 		}
+		delimiterCounter.value = Math.max(delimiterCounter.value, scannedCounter);
 		return;
 	}
 
@@ -67,9 +84,10 @@ const processElement = (element: Node, escapedDelimiters: Set<number>, delimiter
 			if (child.nodeType === Node.TEXT_NODE) {
 				processTextNode(child, escapedDelimiters, delimiterCounter);
 			} else if (child.nodeType === Node.ELEMENT_NODE) {
-				processElement(child, escapedDelimiters, delimiterCounter);
+				processElement(child, escapedDelimiters, delimiterCounter, processedElements);
 			}
 		}
+		delimiterCounter.value = Math.max(delimiterCounter.value, scannedCounter);
 		return;
 	}
 
@@ -141,7 +159,7 @@ const processElement = (element: Node, escapedDelimiters: Set<number>, delimiter
 	// Recurse into any remaining non-spoiler child elements
 	for (const child of Array.from(element.childNodes)) {
 		if (child.nodeType === Node.ELEMENT_NODE && !(child instanceof HTMLElement && child.classList.contains("inline_spoilers-spoiler"))) {
-			processElement(child, escapedDelimiters, delimiterCounter);
+			processElement(child, escapedDelimiters, delimiterCounter, processedElements);
 		}
 	}
 }
@@ -200,10 +218,11 @@ export const updateReadingMode = (element: HTMLElement, plugin: Plugin, ctx?: Ma
 
 	const allowedElems = element.findAll(TAGS);
 	const delimiterCounter = { value: 0 };
+	const processedElements = new WeakSet<Node>();
 
 	for (const elem of allowedElems) {
 		// Process each child node of the element
-		processElement(elem, escapedDelimiters, delimiterCounter);
+		processElement(elem, escapedDelimiters, delimiterCounter, processedElements);
 	}
 
 	const spoilers = element.findAll(".inline_spoilers-spoiler");
