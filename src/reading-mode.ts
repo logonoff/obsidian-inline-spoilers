@@ -42,7 +42,7 @@ const processElement = (element: Node, escapedDelimiters: Set<number>, delimiter
 	processedElements.add(element);
 
 	// Don't process nodes that are already spoiler spans
-	if (element instanceof HTMLElement && element.classList.contains("inline_spoilers-spoiler")) return;
+	if (element.instanceOf(HTMLElement) && element.classList.contains("inline_spoilers-spoiler")) return;
 
 	const fullText = element.textContent ?? "";
 	if (!fullText.includes("||")) return;
@@ -158,7 +158,7 @@ const processElement = (element: Node, escapedDelimiters: Set<number>, delimiter
 
 	// Recurse into any remaining non-spoiler child elements
 	for (const child of Array.from(element.childNodes)) {
-		if (child.nodeType === Node.ELEMENT_NODE && !(child instanceof HTMLElement && child.classList.contains("inline_spoilers-spoiler"))) {
+		if (child.nodeType === Node.ELEMENT_NODE && !(child.instanceOf(HTMLElement) && child.classList.contains("inline_spoilers-spoiler"))) {
 			processElement(child, escapedDelimiters, delimiterCounter, processedElements);
 		}
 	}
@@ -176,7 +176,7 @@ const processTextNode = (node: Node, escapedDelimiters: Set<number>, delimiterCo
 
 	if (validMatches.length === 0) return;
 
-	const fragment = document.createDocumentFragment();
+	const fragment = createFragment();
 	let lastIndex = 0;
 
 	for (const { start, end } of validMatches) {
@@ -243,7 +243,7 @@ export const unloadReadingMode = (workspace: Workspace) => {
 		if (!parent) continue;
 
 		// Re-wrap the spoiler content with || delimiters, preserving child nodes
-		const fragment = document.createDocumentFragment();
+		const fragment = createFragment();
 		fragment.appendChild(document.createTextNode("||"));
 		while (spoiler.firstChild) {
 			fragment.appendChild(spoiler.firstChild);
