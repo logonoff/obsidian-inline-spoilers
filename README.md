@@ -1,8 +1,8 @@
 # Inline spoilers for Obsidian
 
-[![Plugin version](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2Flogonoff%2Fobsidian-inline-spoilers%2Frefs%2Fheads%2Fmaster%2Fmanifest.json&query=version&label=version)](https://github.com/logonoff/obsidian-inline-spoilers/blob/master/manifest.json)
-[![Minimum Obsidian version](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2Flogonoff%2Fobsidian-inline-spoilers%2Frefs%2Fheads%2Fmaster%2Fmanifest.json&query=minAppVersion&logo=obsidian&label=obsidian&color=%237C3AED)](https://obsidian.md/plugins?id=inline-spoilers)
-[![GitHub License](https://img.shields.io/github/license/logonoff/obsidian-inline-spoilers?color=%23a32d2a)](https://github.com/logonoff/obsidian-inline-spoilers/blob/master/LICENSE.md)
+[![Plugin version](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2Flogonoff%2Fobsidian-inline-spoilers%2Frefs%2Fheads%2Fmain%2Fmanifest.json&query=version&label=version)](https://github.com/logonoff/obsidian-inline-spoilers/blob/main/manifest.json)
+[![Minimum Obsidian version](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2Flogonoff%2Fobsidian-inline-spoilers%2Frefs%2Fheads%2Fmain%2Fmanifest.json&query=minAppVersion&logo=obsidian&label=obsidian&color=%237C3AED)](https://obsidian.md/plugins?id=inline-spoilers)
+[![GitHub License](https://img.shields.io/github/license/logonoff/obsidian-inline-spoilers?color=%23a32d2a)](https://github.com/logonoff/obsidian-inline-spoilers/blob/main/LICENSE.md)
 [![GitHub Repo stars](https://img.shields.io/github/stars/logonoff/obsidian-inline-spoilers)](https://github.com/logonoff/obsidian-inline-spoilers)
 
 This plugin adds support for inline spoilers in [Obsidian](https://obsidian.md)
@@ -47,5 +47,5 @@ fix implemented is to submit a pull request. Contributions are always welcome :)
 
 Stars on GitHub are also appreciated!
 
-[styles.css]: https://github.com/logonoff/obsidian-inline-spoilers/blob/master/styles.css
+[styles.css]: https://github.com/logonoff/obsidian-inline-spoilers/blob/main/styles.css
 [GitHub issues page]: https://github.com/logonoff/obsidian-inline-spoilers/issues
